@@ -1,3 +1,4 @@
+import 'package:balai_lab/setting.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
@@ -432,22 +433,37 @@ import 'package:google_fonts/google_fonts.dart';
 
 // // String hasil;
 
-// // void berhasil(BuildContext context) => showDialog(
-// //     context: context,
-// //     builder: (context) => Center(
-// //           child: AlertDialog(
-// //             content: Text(
-// //               Provider.of<Restapi>(context).getmsg(),
-// //               textAlign: TextAlign.center,
-// //               style:
-// //                   TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
-// //             ),
-// //             elevation: 3,
-// // //                actionsPadding: EdgeInsets.only(right: 28),
-
-// //             actions: <Widget>[okButton],
-// //           ),
-// //         ));
+void berhasil(BuildContext context, String uraian) => showDialog(
+      context: context,
+      builder: (context) => Center(
+        child: Container(
+            height: MediaQuery.of(context).size.height * 0.15,
+            width: MediaQuery.of(context).size.height * 0.3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(uraian,
+                    style: GoogleFonts.roboto(
+                      fontSize: 16,
+                      color: biru,
+                      fontWeight: FontWeight.w500,
+                      textStyle: Theme.of(context).textTheme.subtitle1,
+                    )),
+                SizedBox(
+                  height: 10,
+                ),
+                okButton
+              ],
+            ),
+            decoration: BoxDecoration(
+              color: putih,
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              // shadowColor: Color.fromRGBO(237, 155, 12, 1),
+            )),
+      ),
+      // elevation: 5.0,
+    );
 // // void keluar(BuildContext context) => showDialog(
 // //     context: context,
 // //     builder: (context) => Center(
@@ -532,27 +548,26 @@ import 'package:google_fonts/google_fonts.dart';
 // //     ),
 // //   ),
 // // );
-// // var okButton = Builder(
-// //   builder: (BuildContext context) => Material(
-// //     shadowColor: Color.fromRGBO(237, 155, 12, 1),
-// //     child: MaterialButton(
-// //       minWidth: 200.0,
-// //       height: 42.0,
-// //       onPressed: () {
-// //         Navigator.pop(context);
-// //         Navigator.pop(context);
-// //       },
-// //       color: Color.fromRGBO(237, 155, 12, 1),
-// //       child: Text(
-// //         'OK',
-// //         style: TextStyle(
-// //           color: Colors.white,
-// //         ),
-// //         textAlign: TextAlign.center,
-// //       ),
-// //     ),
-// //   ),
-// // );
+var okButton = Builder(
+  builder: (BuildContext context) => Material(
+    shadowColor: birumuda,
+    child: MaterialButton(
+      minWidth: 200.0,
+      height: 42.0,
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      color: biru,
+      child: Text(
+        'OK',
+        style: TextStyle(
+          color: Colors.white,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ),
+  ),
+);
 // // // var gantiButton = Builder(
 // // //     builder: (BuildContext context) => Padding(
 // // //           padding: EdgeInsets.only(left: 30),

@@ -21,20 +21,29 @@ class Jam extends StatefulWidget {
 
 class _JamState extends State<Jam> {
   @override
-  Future<String> uploadImage(XFile file, String lat, String long) async {
-    String fileName = file.path.split('/').last;
-    FormData formData = FormData.fromMap({
-      "foto": await MultipartFile.fromFile(file.path, filename: fileName),
-      "lat": lat,
-      "long": long
-    });
-    var response =
-        await Dio().post("http://localhost:8000/api/absenlogs", data: formData);
-    print(response.data);
-    return response.data;
+  Future uploadImage(File file, String lat, String long, String mac) async {
+    try {
+      print(mac);
+      String fileName = file.path.split('/').last;
+      FormData formData = FormData.fromMap({
+        "foto": await MultipartFile.fromFile(file.path, filename: fileName),
+        "lat": lat,
+        "long": long,
+        "mac_address": mac
+      });
+      var response = await Dio()
+          .post("http://192.168.77.235/api/absenlogs", data: formData);
+      print(response.statusCode);
+      print(response.data);
+      return response.data;
+    } catch (e) {
+      return {"success": false};
+    }
   }
 
+  XFile photo = null;
   bool serviceEnabled;
+  String mac;
   LocationPermission permission;
   final ImagePicker _picker = ImagePicker();
   Widget build(BuildContext context) {
@@ -76,7 +85,7 @@ class _JamState extends State<Jam> {
                                     textStyle:
                                         Theme.of(context).textTheme.subtitle1,
                                   )),
-                              Text("05:00",
+                              Text("",
                                   style: GoogleFonts.roboto(
                                     fontSize: 20,
                                     color: Colors.white,
@@ -89,6 +98,7 @@ class _JamState extends State<Jam> {
                               ),
                               GestureDetector(
                                 onTap: () async {
+                                  mac = await GetMac.macAddress;
                                   serviceEnabled = await Geolocator
                                       .isLocationServiceEnabled();
                                   if (!serviceEnabled) {
@@ -110,13 +120,35 @@ class _JamState extends State<Jam> {
                                           await Geolocator.getCurrentPosition(
                                               desiredAccuracy:
                                                   LocationAccuracy.high);
-                                      final XFile photo =
-                                          await _picker.pickImage(
-                                              source: ImageSource.camera);
-                                      uploadImage(
-                                          photo,
-                                          position.latitude.toString(),
-                                          position.longitude.toString());
+
+                                      await _picker
+                                          .pickImage(source: ImageSource.camera)
+                                          .then((value) => {
+                                                value != null
+                                                    ? photo = value
+                                                    : null
+                                              });
+                                      photo != null
+                                          ? uploadImage(
+                                                  File(photo.path),
+                                                  position.latitude.toString(),
+                                                  position.longitude.toString(),
+                                                  mac)
+                                              .then((value) => {
+                                                    if (value["success"] ==
+                                                        true)
+                                                      {
+                                                        berhasil(context,
+                                                            value["message"])
+                                                      }
+                                                    else
+                                                      {
+                                                        berhasil(context,
+                                                            "Absen Gagal")
+                                                      }
+                                                  })
+                                          : null;
+                                      photo = null;
                                     }
                                   } else {
                                     Position position =
@@ -124,13 +156,33 @@ class _JamState extends State<Jam> {
                                             desiredAccuracy:
                                                 LocationAccuracy.high);
 
-                                    final XFile photo = await _picker.pickImage(
-                                        source: ImageSource.camera);
-                                    print({
-                                      "mac": await GetMac.macAddress,
-                                      "latitude": position.latitude,
-                                      "longitude": position.longitude,
-                                    });
+                                    await _picker
+                                        .pickImage(source: ImageSource.camera)
+                                        .then((value) => {
+                                              value != null
+                                                  ? photo = value
+                                                  : null
+                                            });
+                                    photo != null
+                                        ? uploadImage(
+                                                File(photo.path),
+                                                position.latitude.toString(),
+                                                position.longitude.toString(),
+                                                mac)
+                                            .then((value) => {
+                                                  if (value["success"] == true)
+                                                    {
+                                                      berhasil(context,
+                                                          value["message"])
+                                                    }
+                                                  else
+                                                    {
+                                                      berhasil(context,
+                                                          "Absen Gagal")
+                                                    }
+                                                })
+                                        : null;
+                                    photo = null;
                                   }
                                 },
                                 child: loginButton(
@@ -154,7 +206,7 @@ class _JamState extends State<Jam> {
                                     textStyle:
                                         Theme.of(context).textTheme.subtitle1,
                                   )),
-                              Text("17:23",
+                              Text("",
                                   style: GoogleFonts.roboto(
                                     fontSize: 20,
                                     color: Colors.white,
@@ -165,8 +217,98 @@ class _JamState extends State<Jam> {
                               SizedBox(
                                 height: 40,
                               ),
-                              loginButton(
-                                  "Absen Keluar", birumuda, Colors.black),
+                              GestureDetector(
+                                onTap: () async {
+                                  mac = await GetMac.macAddress;
+                                  serviceEnabled = await Geolocator
+                                      .isLocationServiceEnabled();
+                                  if (!serviceEnabled) {
+                                    return Future.error(
+                                        'Location services are disabled');
+                                  }
+
+                                  permission =
+                                      await Geolocator.checkPermission();
+                                  if (permission == LocationPermission.denied) {
+                                    permission =
+                                        await Geolocator.requestPermission();
+                                    if (permission ==
+                                        LocationPermission.denied) {
+                                      return Future.error(
+                                          'Location permissions are denied');
+                                    } else {
+                                      Position position =
+                                          await Geolocator.getCurrentPosition(
+                                              desiredAccuracy:
+                                                  LocationAccuracy.high);
+
+                                      await _picker
+                                          .pickImage(source: ImageSource.camera)
+                                          .then((value) => {
+                                                value != null
+                                                    ? photo = value
+                                                    : null
+                                              });
+                                      photo != null
+                                          ? uploadImage(
+                                                  File(photo.path),
+                                                  position.latitude.toString(),
+                                                  position.longitude.toString(),
+                                                  mac)
+                                              .then((value) => {
+                                                    if (value["success"] ==
+                                                        true)
+                                                      {
+                                                        berhasil(context,
+                                                            value["message"])
+                                                      }
+                                                    else
+                                                      {
+                                                        berhasil(context,
+                                                            "Absen Gagal")
+                                                      }
+                                                  })
+                                          : null;
+                                      photo = null;
+                                    }
+                                  } else {
+                                    Position position =
+                                        await Geolocator.getCurrentPosition(
+                                            desiredAccuracy:
+                                                LocationAccuracy.high);
+
+                                    await _picker
+                                        .pickImage(source: ImageSource.camera)
+                                        .then((value) => {
+                                              value != null
+                                                  ? photo = value
+                                                  : null
+                                            });
+                                    photo != null
+                                        ? uploadImage(
+                                                File(photo.path),
+                                                position.latitude.toString(),
+                                                position.longitude.toString(),
+                                                mac)
+                                            .then((value) => {
+                                                  if (value["success"] == true)
+                                                    {
+                                                      berhasil(context,
+                                                          value["message"])
+                                                    }
+                                                  else
+                                                    {
+                                                      berhasil(context,
+                                                          "Absen Gagal")
+                                                    }
+                                                })
+                                        : null;
+                                    photo = null;
+                                  }
+                                },
+                                child: loginButton(
+                                    "Absen Keluar", birumuda, Colors.black),
+                              ),
                             ],
                           ),
                         ))
