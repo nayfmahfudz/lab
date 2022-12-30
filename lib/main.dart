@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'package:balai_lab/jam.dart';
-import 'package:balai_lab/splashscreen.dart';
+import 'package:Absen_BBLKS/jam.dart';
+import 'package:Absen_BBLKS/splashscreen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';

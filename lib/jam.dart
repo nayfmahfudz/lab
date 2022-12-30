@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:balai_lab/setting.dart';
+import 'package:Absen_BBLKS/setting.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -32,7 +32,7 @@ class _JamState extends State<Jam> {
         "mac_address": mac
       });
       var response = await Dio()
-          .post("http://192.168.6.73:8000/api/absenlogs", data: formData);
+          .post("http://192.168.6.61:8000/api/absenlogs", data: formData);
       print(response.statusCode);
       print(response.data);
       return response.data;
