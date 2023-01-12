@@ -23,7 +23,15 @@ class _JamState extends State<Jam> {
   @override
   Future uploadImage(File file, String lat, String long, String mac) async {
     try {
-      print(mac);
+      if (file == null) {
+        return "Foto Tidak ada";
+      }
+      if (mac == null) {
+        return "Terjadi Masalah";
+      }
+      if (lat == null || lat == "" && long == null || long == "") {
+        return "Foto Tidak ada";
+      }
       String fileName = file.path.split('/').last;
       FormData formData = FormData.fromMap({
         "foto": await MultipartFile.fromFile(file.path, filename: fileName),
@@ -31,13 +39,13 @@ class _JamState extends State<Jam> {
         "long": long,
         "mac_address": mac
       });
-      var response = await Dio()
-          .post("http://192.168.6.61:8000/api/absenlogs", data: formData);
+      var response =
+          await Dio().post("http://192.168.6.3/api/absenlogs", data: formData);
       print(response.statusCode);
       print(response.data);
       return response.data;
     } catch (e) {
-      return {"success": false};
+      return {"message": e.toString()};
     }
   }
 
@@ -106,8 +114,8 @@ class _JamState extends State<Jam> {
                                   serviceEnabled = await Geolocator
                                       .isLocationServiceEnabled();
                                   if (!serviceEnabled) {
-                                    return Future.error(
-                                        'Location services are disabled');
+                                    berhasil(
+                                        context, "Membutuh Izin Geolocation ");
                                   }
 
                                   permission =
@@ -117,8 +125,8 @@ class _JamState extends State<Jam> {
                                         await Geolocator.requestPermission();
                                     if (permission ==
                                         LocationPermission.denied) {
-                                      return Future.error(
-                                          'Location permissions are denied');
+                                      berhasil(
+                                          context, "Izin Location Ditolak");
                                     } else {
                                       Position position =
                                           await Geolocator.getCurrentPosition(
@@ -146,10 +154,7 @@ class _JamState extends State<Jam> {
                                                             value["message"])
                                                       }
                                                     else
-                                                      {
-                                                        berhasil(context,
-                                                            "Absen Gagal")
-                                                      }
+                                                      {berhasil(context, value)}
                                                   })
                                           : null;
                                       photo = null;
@@ -180,10 +185,7 @@ class _JamState extends State<Jam> {
                                                           value["message"])
                                                     }
                                                   else
-                                                    {
-                                                      berhasil(context,
-                                                          "Absen Gagal")
-                                                    }
+                                                    {berhasil(context, value)}
                                                 })
                                         : null;
                                     photo = null;

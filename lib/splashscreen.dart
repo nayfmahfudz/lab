@@ -9,7 +9,7 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final logo = Image.asset(
-      "assets/kemenkes.png",
+      "assets/logo-bblks.png",
       height: 300,
       width: 300,
     );

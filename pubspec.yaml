@@ -40,8 +40,8 @@ dependencies:
   dio:
   mac_address: ^1.0.0
   geolocator: ^9.0.2
-  image_picker: ^0.8.6
   icons_launcher: ^2.0.6
+  image_picker: ^0.8.6
 
 dev_dependencies:
   flutter_test:
