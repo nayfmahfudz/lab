@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Absen_BBLKS/setting.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
@@ -26,26 +27,28 @@ class _JamState extends State<Jam> {
       if (file == null) {
         return "Foto Tidak ada";
       }
-      if (mac == null) {
-        return "Terjadi Masalah";
-      }
+      // if (mac == "") {
+      //   print("Terjadi Masalah");
+      //   return "Terjadi Masalah";
+      // }
       if (lat == null || lat == "" && long == null || long == "") {
         return "Foto Tidak ada";
       }
       String fileName = file.path.split('/').last;
+
       FormData formData = FormData.fromMap({
         "foto": await MultipartFile.fromFile(file.path, filename: fileName),
         "lat": lat,
         "long": long,
-        "mac_address": mac
+        "mac_address": "sassasasa"
       });
-      var response =
-          await Dio().post("http://192.168.6.3/api/absenlogs", data: formData);
+      var response = await Dio()
+          .post("http://192.168.6.3:8000/api/absenlogs", data: formData);
       print(response.statusCode);
       print(response.data);
       return response.data;
     } catch (e) {
-      return {"message": e.toString()};
+      print(e);
     }
   }
 
@@ -110,14 +113,14 @@ class _JamState extends State<Jam> {
                               ),
                               GestureDetector(
                                 onTap: () async {
-                                  mac = await GetMac.macAddress;
+                                
                                   serviceEnabled = await Geolocator
                                       .isLocationServiceEnabled();
                                   if (!serviceEnabled) {
                                     berhasil(
                                         context, "Membutuh Izin Geolocation ");
                                   }
-
+                                  print("1");
                                   permission =
                                       await Geolocator.checkPermission();
                                   if (permission == LocationPermission.denied) {
@@ -128,6 +131,7 @@ class _JamState extends State<Jam> {
                                       berhasil(
                                           context, "Izin Location Ditolak");
                                     } else {
+                                      print("2");
                                       Position position =
                                           await Geolocator.getCurrentPosition(
                                               desiredAccuracy:
@@ -160,6 +164,7 @@ class _JamState extends State<Jam> {
                                       photo = null;
                                     }
                                   } else {
+                                    print(mac);
                                     Position position =
                                         await Geolocator.getCurrentPosition(
                                             desiredAccuracy:
@@ -172,6 +177,7 @@ class _JamState extends State<Jam> {
                                                   ? photo = value
                                                   : null
                                             });
+                                    print(photo.path);
                                     photo != null
                                         ? uploadImage(
                                                 File(photo.path),
