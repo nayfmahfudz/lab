@@ -40,7 +40,7 @@ class _JamState extends State<Jam> {
         "foto": await MultipartFile.fromFile(file.path, filename: fileName),
         "lat": lat,
         "long": long,
-        "mac_address": "sassasasa"
+        "mac_address": mac
       });
       var response = await Dio()
           .post("http://192.168.6.3:8000/api/absenlogs", data: formData);
@@ -55,6 +55,8 @@ class _JamState extends State<Jam> {
   XFile photo = null;
   bool serviceEnabled;
   String mac;
+  String outputnip = "";
+  TextEditingController nipText = TextEditingController();
   LocationPermission permission;
   final ImagePicker _picker = ImagePicker();
   Widget build(BuildContext context) {
@@ -67,6 +69,30 @@ class _JamState extends State<Jam> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      nip(
+                        context,
+                        nipText,
+                        (String value) {
+                          setState(() {
+                            outputnip = value;
+                          });
+                        },
+                      );
+                      nipText;
+                    });
+                  },
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.045,
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [Text("NIP"), Expanded(child: Text(outputnip))],
+                    ),
+                  ),
+                ),
                 Padding(
                   padding:
                       EdgeInsets.all(MediaQuery.of(context).size.width / 9),
@@ -113,7 +139,6 @@ class _JamState extends State<Jam> {
                               ),
                               GestureDetector(
                                 onTap: () async {
-                                
                                   serviceEnabled = await Geolocator
                                       .isLocationServiceEnabled();
                                   if (!serviceEnabled) {
@@ -149,7 +174,7 @@ class _JamState extends State<Jam> {
                                                   File(photo.path),
                                                   position.latitude.toString(),
                                                   position.longitude.toString(),
-                                                  mac)
+                                                  outputnip)
                                               .then((value) => {
                                                     if (value["success"] ==
                                                         true)
@@ -164,7 +189,7 @@ class _JamState extends State<Jam> {
                                       photo = null;
                                     }
                                   } else {
-                                    print(mac);
+                                    print(outputnip);
                                     Position position =
                                         await Geolocator.getCurrentPosition(
                                             desiredAccuracy:
@@ -177,13 +202,12 @@ class _JamState extends State<Jam> {
                                                   ? photo = value
                                                   : null
                                             });
-                                    print(photo.path);
                                     photo != null
                                         ? uploadImage(
                                                 File(photo.path),
                                                 position.latitude.toString(),
                                                 position.longitude.toString(),
-                                                mac)
+                                                outputnip)
                                             .then((value) => {
                                                   if (value["success"] == true)
                                                     {
@@ -266,7 +290,7 @@ class _JamState extends State<Jam> {
                                                   File(photo.path),
                                                   position.latitude.toString(),
                                                   position.longitude.toString(),
-                                                  mac)
+                                                  outputnip)
                                               .then((value) => {
                                                     if (value["success"] ==
                                                         true)
@@ -301,7 +325,7 @@ class _JamState extends State<Jam> {
                                                 File(photo.path),
                                                 position.latitude.toString(),
                                                 position.longitude.toString(),
-                                                mac)
+                                                outputnip)
                                             .then((value) => {
                                                   if (value["success"] == true)
                                                     {

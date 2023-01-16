@@ -432,6 +432,54 @@ import 'package:google_fonts/google_fonts.dart';
 // // int switchControl;
 
 // // String hasil;
+void nip(BuildContext context, TextEditingController controller,
+        Function(String) callback) =>
+    showDialog(
+      context: context,
+      builder: (context) => SafeArea(
+        minimum: EdgeInsets.fromLTRB(
+            MediaQuery.of(context).size.height * 0.13,
+            MediaQuery.of(context).size.height * 0.3,
+            MediaQuery.of(context).size.height * 0.13,
+            MediaQuery.of(context).size.height * 0.3),
+        child: Scaffold(
+          backgroundColor: putih,
+          body: Center(
+            child: Container(
+                height: MediaQuery.of(context).size.height * 0.15,
+                width: MediaQuery.of(context).size.height * 0.3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Masukan NIP",
+                        style: GoogleFonts.roboto(
+                          fontSize: 16,
+                          color: biru,
+                          fontWeight: FontWeight.w500,
+                          textStyle: Theme.of(context).textTheme.subtitle1,
+                        )),
+                    Container(
+                      child: TextFormField(
+                        onChanged: (newValue) {
+                          callback(newValue);
+                        },
+                        controller: controller,
+                      ),
+                    ),
+                    okButton
+                  ],
+                ),
+                decoration: BoxDecoration(
+                  color: putih,
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  // shadowColor: Color.fromRGBO(237, 155, 12, 1),
+                )),
+          ),
+        ),
+      ),
+      // elevation: 5.0,
+    );
 
 void berhasil(BuildContext context, String uraian) => showDialog(
       context: context,
