@@ -439,13 +439,15 @@ void nip(BuildContext context, TextEditingController controller,
       builder: (context) => SafeArea(
         minimum: EdgeInsets.fromLTRB(
             MediaQuery.of(context).size.height * 0.13,
-            MediaQuery.of(context).size.height * 0.3,
+            MediaQuery.of(context).size.height * 0.35,
             MediaQuery.of(context).size.height * 0.13,
-            MediaQuery.of(context).size.height * 0.3),
-        child: Scaffold(
-          backgroundColor: putih,
-          body: Center(
-            child: Container(
+            MediaQuery.of(context).size.height * 0.35),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: Scaffold(
+            backgroundColor: putih,
+            body: Center(
+              child: Container(
                 height: MediaQuery.of(context).size.height * 0.15,
                 width: MediaQuery.of(context).size.height * 0.3,
                 child: Column(
@@ -459,7 +461,8 @@ void nip(BuildContext context, TextEditingController controller,
                           fontWeight: FontWeight.w500,
                           textStyle: Theme.of(context).textTheme.subtitle1,
                         )),
-                    Container(
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
                       child: TextFormField(
                         onChanged: (newValue) {
                           callback(newValue);
@@ -467,14 +470,14 @@ void nip(BuildContext context, TextEditingController controller,
                         controller: controller,
                       ),
                     ),
+                    SizedBox(
+                      height: 25,
+                    ),
                     okButton
                   ],
                 ),
-                decoration: BoxDecoration(
-                  color: putih,
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  // shadowColor: Color.fromRGBO(237, 155, 12, 1),
-                )),
+              ),
+            ),
           ),
         ),
       ),
