@@ -1,17 +1,15 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:ui';
 import 'package:Absen_BBLKS/jam.dart';
 import 'package:Absen_BBLKS/splashscreen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // await initializeService();
-  runApp(MyApp());
+  initializeDateFormatting('id_ID', null).then((_) => runApp(MyApp()));
 }
 
 class MyApp extends StatefulWidget {

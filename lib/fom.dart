@@ -445,35 +445,46 @@ void nip(BuildContext context, TextEditingController controller,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20.0),
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             backgroundColor: putih,
             body: Center(
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.15,
+                height: MediaQuery.of(context).size.height * 0.4,
                 width: MediaQuery.of(context).size.height * 0.3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Masukan NIP",
-                        style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          color: biru,
-                          fontWeight: FontWeight.w500,
-                          textStyle: Theme.of(context).textTheme.subtitle1,
-                        )),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                      child: TextFormField(
-                        onChanged: (newValue) {
-                          callback(newValue);
-                        },
-                        controller: controller,
+                    Expanded(
+                      flex: 3,
+                      child: Center(
+                        child: Text("Masukan NIP",
+                            style: GoogleFonts.roboto(
+                              fontSize: 16,
+                              color: biru,
+                              fontWeight: FontWeight.w500,
+                              textStyle: Theme.of(context).textTheme.subtitle1,
+                            )),
                       ),
                     ),
-                    SizedBox(
-                      height: 25,
+                    Expanded(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                          child: TextFormField(
+                            onChanged: (newValue) {
+                              callback(newValue);
+                            },
+                            controller: controller,
+                          ),
+                        ),
+                      ),
                     ),
-                    okButton
+                    Expanded(child: SizedBox()),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      child: okButton,
+                    )
                   ],
                 ),
               ),

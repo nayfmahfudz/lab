@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
 import 'package:flutter_analog_clock/flutter_analog_clock.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:mac_address/mac_address.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slide_digital_clock/slide_digital_clock.dart';
@@ -49,6 +50,9 @@ class _JamState extends State<Jam> {
     }
   }
 
+// DateFormat('EEEE, d MMM, yyyy.', "id_ID")
+//                                             .format(DateTime.now())) ??
+//                                         ""
   XFile photo = null;
   bool serviceEnabled;
   String masuk = "";
@@ -66,10 +70,10 @@ class _JamState extends State<Jam> {
       (String value) {
         setState(() {
           outputnip = value;
+          prefs.setString('nip', value);
         });
       },
     );
-    prefs.setString('nip', outputnip);
   }
 
   absen(String absen) async {
@@ -105,6 +109,8 @@ class _JamState extends State<Jam> {
   ambilData() async {
     final prefs = await SharedPreferences.getInstance();
     outputnip = prefs.getString('nip') ?? "";
+    keluar = prefs.getString('keluar') ?? "";
+    masuk = prefs.getString('masuk') ?? "";
     setState(() {
       nipText.text = outputnip;
     });
@@ -134,7 +140,7 @@ class _JamState extends State<Jam> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("NIP",
+                        Text("ID",
                             textAlign: TextAlign.start,
                             style: GoogleFonts.roboto(
                               fontSize: 32,
@@ -153,12 +159,8 @@ class _JamState extends State<Jam> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      MediaQuery.of(context).size.width / 12,
-                      MediaQuery.of(context).size.width / 12,
-                      MediaQuery.of(context).size.width / 12,
-                      0),
+                Expanded(
+                  flex: 1,
                   child: DigitalClock(
                     digitAnimationStyle: Curves.easeIn,
                     showSecondsDigit: false,
@@ -176,6 +178,7 @@ class _JamState extends State<Jam> {
                   ),
                 ),
                 Expanded(
+                  flex: 2,
                   child: Container(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -199,7 +202,7 @@ class _JamState extends State<Jam> {
                               Text(masuk,
                                   style: GoogleFonts.roboto(
                                     fontSize: 20,
-                                    color: Colors.white,
+                                    color: birumuda,
                                     fontWeight: FontWeight.w500,
                                     textStyle:
                                         Theme.of(context).textTheme.subtitle1,
@@ -208,7 +211,17 @@ class _JamState extends State<Jam> {
                                 height: 40,
                               ),
                               GestureDetector(
-                                onTap: () => absen("masuk"),
+                                onTap: () async {
+                                  setState(() {
+                                    masuk = DateFormat('h:mm,d MMM', "id_ID")
+                                        .format(DateTime.now());
+
+                                    absen("masuk");
+                                  });
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setString('masuk', masuk);
+                                },
                                 child: loginButton(
                                     "Absen Masuk", birumuda, Colors.black),
                               ),
@@ -233,7 +246,7 @@ class _JamState extends State<Jam> {
                               Text(keluar,
                                   style: GoogleFonts.roboto(
                                     fontSize: 20,
-                                    color: Colors.white,
+                                    color: birumuda,
                                     fontWeight: FontWeight.w500,
                                     textStyle:
                                         Theme.of(context).textTheme.subtitle1,
@@ -242,7 +255,16 @@ class _JamState extends State<Jam> {
                                 height: 40,
                               ),
                               GestureDetector(
-                                onTap: () => absen("keluar"),
+                                onTap: () async {
+                                  setState(() {
+                                    keluar = DateFormat('h:mm,d MMM', "id_ID")
+                                        .format(DateTime.now());
+                                    absen("keluar");
+                                  });
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setString('keluar', keluar);
+                                },
                                 child: loginButton(
                                     "Absen Keluar", birumuda, Colors.black),
                               ),

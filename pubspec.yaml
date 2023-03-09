@@ -43,6 +43,7 @@ dependencies:
   icons_launcher: ^2.0.6
   image_picker: ^0.8.6
   slide_digital_clock: ^1.0.2
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
