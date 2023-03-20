@@ -44,6 +44,7 @@ dependencies:
   image_picker: ^0.8.6
   slide_digital_clock: ^1.0.2
   intl: ^0.18.0
+  url_launcher: ^6.1.10
 
 dev_dependencies:
   flutter_test:

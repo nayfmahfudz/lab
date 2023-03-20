@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:Absen_BBLKS/setting.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +59,8 @@ class _JamState extends State<Jam> {
   String keluar = "";
   String mac;
   String outputnip = "";
+  var url = Uri(
+      host: "192.168.6.3", port: 8000, scheme: 'http', path: '/api/absenlogs');
   TextEditingController nipText = TextEditingController();
   LocationPermission permission;
   final ImagePicker _picker = ImagePicker();
@@ -275,6 +277,26 @@ class _JamState extends State<Jam> {
                     ),
                   ),
                 ),
+                Expanded(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          if (await canLaunchUrl(url))
+                            await launchUrl(url);
+                          else
+                            // can't launch url, there is some error
+                            berhasil(context, "Tidak Bisa Mengakses Server");
+                        },
+                        child: loginButton("Server", birumuda, Colors.black),
+                      ),
+                    ],
+                  ),
+                ))
               ],
             ),
           ),
