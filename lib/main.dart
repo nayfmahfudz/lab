@@ -1,7 +1,9 @@
 import 'dart:async';
-import 'package:Absen_BBLKS/jam.dart';
-import 'package:Absen_BBLKS/splashscreen.dart';
-import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'package:Absen_BBWS/home.dart';
+import 'package:Absen_BBWS/login.dart';
+import 'package:Absen_BBWS/setting.dart';
+import 'package:Absen_BBWS/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -9,11 +11,11 @@ import 'package:intl/date_symbol_data_local.dart';
 Future<void> main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // await initializeService();
-  initializeDateFormatting('id_ID', null).then((_) => runApp(MyApp()));
+  initializeDateFormatting('id_ID', null).then((_) => runApp(const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp();
+  const MyApp({super.key});
 // service.startService();
   @override
   State<MyApp> createState() => _MyAppState();
@@ -21,20 +23,30 @@ class MyApp extends StatefulWidget {
 
 @override
 class _MyAppState extends State<MyApp> {
+  @override
   initState() {
     super.initState();
   }
 
   Future splashscreen() async {
-    return await Future.delayed(Duration(seconds: 6), () {
-      return true;
+    return await Future.delayed(const Duration(seconds: 4), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      user = prefs.getString("user") != null
+          ? jsonDecode(prefs.getString("user").toString())
+          : {};
+      // ignore: unnecessary_null_comparison
+      if (user.isNotEmpty && user != null && user != {}) {
+        return true;
+      } else {
+        return true;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Balai Lab',
+        title: 'Absen BBWS',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -42,9 +54,12 @@ class _MyAppState extends State<MyApp> {
           future: splashscreen(),
           builder: ((context, snapshot) {
             if (snapshot.data == true) {
-              return Jam();
+              if (user.isNotEmpty) {
+                return const Home();
+              }
+              return const Login();
             } else {
-              return SplashScreen();
+              return const SplashScreen();
             }
           }),
         ));

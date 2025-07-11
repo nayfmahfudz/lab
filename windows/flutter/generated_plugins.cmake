@@ -3,7 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  connectivity_plus
+  file_selector_windows
   geolocator_windows
+  nb_utils
   url_launcher_windows
 )
 

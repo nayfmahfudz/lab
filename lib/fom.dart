@@ -1,23 +1,39 @@
-import 'package:Absen_BBLKS/setting.dart';
+import 'package:Absen_BBWS/setting.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:google_fonts/google_fonts.dart';
-// import 'package:keungan/Login.dart';
-// import 'package:keungan/homepage.dart';
-// import 'package:keungan/jam.dart';
-// import 'package:keungan/statistik.dart';
-// import '../BLOCS/api.dart';
-// import '../main.dart';
-// import '../personal.dart';
-// import '../setting.dart';
-// import '../tugas.dart';
+import 'package:page_transition/page_transition.dart';
 
-// navigateToNextScreen(BuildContext context, Widget newScreen) {
-//   Navigator.of(context)
-//       .push(MaterialPageRoute(builder: (context) => newScreen));
-// }
+navigateToNextScreen(BuildContext context, Widget newScreen) {
+  Navigator.push(
+      context,
+      PageTransition(
+        curve: Curves.linear,
+        type: PageTransitionType.rightToLeft,
+        child: newScreen,
+        duration: const Duration(milliseconds: 400),
+      ));
+}
 
+replaceToNextScreen(BuildContext context, Widget newScreen) {
+  Navigator.pushAndRemoveUntil(
+    context,
+    PageTransition(
+      curve: Curves.linear,
+      type: PageTransitionType.rightToLeft,
+      child: newScreen,
+      duration: const Duration(milliseconds: 400),
+    ),
+    (Route<dynamic> route) => false,
+  );
+}
+
+tinggi(context) {
+  return MediaQuery.of(context).size.height;
+}
+
+lebar(context) {
+  return MediaQuery.of(context).size.width;
+}
 // tinggiAs(context) {
 //   var pixRatio = MediaQuery.of(context).devicePixelRatio;
 //   var heightRatio = MediaQuery.of(context).size.height * pixRatio;
@@ -448,7 +464,7 @@ void nip(BuildContext context, TextEditingController controller,
             resizeToAvoidBottomInset: false,
             backgroundColor: putih,
             body: Center(
-              child: Container(
+              child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.4,
                 width: MediaQuery.of(context).size.height * 0.3,
                 child: Column(
@@ -463,14 +479,14 @@ void nip(BuildContext context, TextEditingController controller,
                               fontSize: 16,
                               color: biru,
                               fontWeight: FontWeight.w500,
-                              textStyle: Theme.of(context).textTheme.subtitle1,
+                              textStyle: Theme.of(context).textTheme.bodyMedium,
                             )),
                       ),
                     ),
                     Expanded(
                       child: Center(
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                           child: TextFormField(
                             onChanged: (newValue) {
                               callback(newValue);
@@ -480,9 +496,9 @@ void nip(BuildContext context, TextEditingController controller,
                         ),
                       ),
                     ),
-                    Expanded(child: SizedBox()),
+                    const Expanded(child: SizedBox()),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                       child: okButton,
                     )
                   ],
@@ -499,29 +515,32 @@ void berhasil(BuildContext context, String uraian) => showDialog(
       context: context,
       builder: (context) => Center(
         child: Container(
-            height: MediaQuery.of(context).size.height * 0.15,
+            height: MediaQuery.of(context).size.height * 0.2,
             width: MediaQuery.of(context).size.height * 0.3,
+            decoration: const BoxDecoration(
+              color: putih,
+              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              // shadowColor: Color.fromRGBO(237, 155, 12, 1),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(uraian,
-                    style: GoogleFonts.roboto(
-                      fontSize: 16,
-                      color: biru,
-                      fontWeight: FontWeight.w500,
-                      textStyle: Theme.of(context).textTheme.subtitle1,
-                    )),
-                SizedBox(
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(uraian,
+                      style: GoogleFonts.roboto(
+                        fontSize: 16,
+                        color: biru,
+                        fontWeight: FontWeight.bold,
+                        textStyle: Theme.of(context).textTheme.bodyMedium,
+                      )),
+                ),
+                const SizedBox(
                   height: 10,
                 ),
                 okButton
               ],
-            ),
-            decoration: BoxDecoration(
-              color: putih,
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              // shadowColor: Color.fromRGBO(237, 155, 12, 1),
             )),
       ),
       // elevation: 5.0,
@@ -613,19 +632,22 @@ void berhasil(BuildContext context, String uraian) => showDialog(
 var okButton = Builder(
   builder: (BuildContext context) => Material(
     shadowColor: birumuda,
-    child: MaterialButton(
-      minWidth: 200.0,
-      height: 42.0,
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      color: biru,
-      child: Text(
-        'OK',
-        style: TextStyle(
-          color: Colors.white,
+    child: Padding(
+      padding: const EdgeInsets.only(left: 25, right: 25, bottom: 10, top: 10),
+      child: MaterialButton(
+        minWidth: 200.0,
+        height: 42.0,
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        color: biru,
+        child: const Text(
+          'OK',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+          textAlign: TextAlign.center,
         ),
-        textAlign: TextAlign.center,
       ),
     ),
   ),
@@ -763,19 +785,19 @@ Widget loginButton(String text, Color warna, Color textwarna) {
   return Builder(
     builder: (context) => Container(
       height: MediaQuery.of(context).size.height * 0.08,
+      decoration: BoxDecoration(
+        color: warna,
+        borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+        // shadowColor: Color.fromRGBO(237, 155, 12, 1),
+      ),
       child: Center(
           child: Text(text,
               style: GoogleFonts.roboto(
                 fontSize: 16,
                 color: textwarna,
                 fontWeight: FontWeight.w500,
-                textStyle: Theme.of(context).textTheme.subtitle1,
+                textStyle: Theme.of(context).textTheme.bodyMedium,
               ))),
-      decoration: BoxDecoration(
-        color: warna,
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-        // shadowColor: Color.fromRGBO(237, 155, 12, 1),
-      ),
       // elevation: 5.0,
     ),
   );
@@ -786,7 +808,7 @@ text(String text, Function to) {
       builder: (BuildContext context) => GestureDetector(
             child: Text(
               text,
-              style: TextStyle(color: Colors.black54),
+              style: const TextStyle(color: Colors.black54),
             ),
             onTap: () {
               to;

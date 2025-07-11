@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "Absen_BBLKS" "\0"
+            VALUE "FileDescription", "Absen_BBWS" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "Absen_BBLKS" "\0"
+            VALUE "InternalName", "Absen_BBWS" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "Absen_BBLKS.exe" "\0"
-            VALUE "ProductName", "Absen_BBLKS" "\0"
+            VALUE "OriginalFilename", "Absen_BBWS.exe" "\0"
+            VALUE "ProductName", "Absen_BBWS" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
