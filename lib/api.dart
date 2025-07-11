@@ -63,14 +63,18 @@ Future login(BuildContext context, Map data) async {
 
 Future daerah(BuildContext context, String daerah, Int kode) async {
   try {
-    UrlDaerah = 'https://ibnux.github.io/data-indonesia/kelurahan/${kode}.json';
-    var response = await Dio().get('$url/daerah',
-        queryParameters: {"daerah": daerah, "kode": kode},
-        options: Options(headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-        }));
-    return response.data;
-
+    var UrlDaerah = '';
+    if (daerah == "Kecamatan") {
+      UrlDaerah =
+          'https://ibnux.github.io/data-indonesia/kecamatan/${kode}.json';
+    } else {
+      var response = await Dio().get('$url/daerah',
+          queryParameters: {"daerah": daerah, "kode": kode},
+          options: Options(headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+          }));
+      return response.data;
+    }
     var response = await Dio().get('$url/units',
         options: Options(
             headers: {"Content-Type": "application/json;charset=UTF-8"}));

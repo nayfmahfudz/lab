@@ -47,22 +47,27 @@ const appOpenCount = 'appOpenCount';
 /// Linux - for linux, you have to change default window width in linux/my_application.cc
 const applicationMaxWidth = 500.0;
 
-const profileImage = 'images/widgets/materialWidgets/mwInputSelectionWidgets/Checkbox/profile.png';
+const profileImage =
+    'images/widgets/materialWidgets/mwInputSelectionWidgets/Checkbox/profile.png';
 const isDarkModeOnPref = 'isDarkModeOnPref';
 const dateFormat = 'MMM dd, yyyy';
 
 const BaseUrl = 'https://assets.iqonic.design/old-themeforest-images/prokit';
-const SourceCodeUrl = 'https://codecanyon.net/item/prokit-flutter-app-ui-design-templete-kit/25787190?s_rank=11';
+const SourceCodeUrl =
+    'https://codecanyon.net/item/prokit-flutter-app-ui-design-templete-kit/25787190?s_rank=11';
 const PlayStoreUrl = 'https://play.google.com/store/apps/details?id=';
-const DocumentationUrl = 'https://wordpress.iqonic.design/docs/product/prokit-flutter/';
-const ChangeLogsUrl = 'https://wordpress.iqonic.design/docs/product/prokit-flutter/updates/change-logs/';
+const DocumentationUrl =
+    'https://wordpress.iqonic.design/docs/product/prokit-flutter/';
+const ChangeLogsUrl =
+    'https://wordpress.iqonic.design/docs/product/prokit-flutter/updates/change-logs/';
 const MainSiteUrl = 'https://prokit.iqonic.design/';
 const BuyNowUrl = 'https://1.envato.market/a1NMMZ';
 
 const bannerAdIdForAndroidRelease = "ca-app-pub-1399327544318575/5024384528";
 const bannerAdIdForAndroid = "ca-app-pub-3940256099942544/63009743111";
 const bannerAdIdForIos = "ca-app-pub-3940256099942544/293474316";
-const InterstitialAdIdForAndroidRelease = "ca-app-pub-1399327544318575/434597158";
+const InterstitialAdIdForAndroidRelease =
+    "ca-app-pub-1399327544318575/434597158";
 const InterstitialAdIdForAndroid = "ca-app-pub-3940256099942544/103433712";
 const interstitialAdIdForIos = "ca-app-pub-3940256099942544/4411443910";
 
@@ -70,7 +75,8 @@ const SampleImageUrl = '$BaseUrl/images/defaultTheme/slider/01.jpg';
 const SampleImageUrl2 = '$BaseUrl/images/defaultTheme/slider/04.jpg';
 const SampleImageUrl3 = '$BaseUrl/images/defaultTheme/slider/03.jpg';
 const SampleImageUrl4 = '$BaseUrl/images/defaultTheme/slider/05.jpg';
-const SampleProfileImageUrl = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200';
+const SampleProfileImageUrl =
+    'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200';
 
 const ProductImg1 = '$BaseUrl/images/defaultTheme/product/Bag.png';
 const ProductImg2 = '$BaseUrl/images/defaultTheme/product/Chair.png';
@@ -82,8 +88,10 @@ const ProductImg7 = '$BaseUrl/images/defaultTheme/product/shoes.png';
 const ProductImg8 = '$BaseUrl/images/defaultTheme/product/skincare.png';
 const ProductImg9 = '$BaseUrl/images/defaultTheme/product/tshirt.png';
 
-const ProKitShortText = 'ProKit – Biggest Flutter UI kit is the ultimate library of Flutter UI templates';
-const ProKitLongText = 'ProKit – Biggest Flutter UI kit is the ultimate library of Flutter UI templates combined into a high-quality Flutter UI kit for Android/iOS developers';
+const ProKitShortText =
+    'ProKit – Biggest Flutter UI kit is the ultimate library of Flutter UI templates';
+const ProKitLongText =
+    'ProKit – Biggest Flutter UI kit is the ultimate library of Flutter UI templates combined into a high-quality Flutter UI kit for Android/iOS developers';
 const ProKitSoLongText =
     'ProKit – Biggest Flutter UI kit is the ultimate library of Flutter UI templates combined into a high-quality Flutter UI kit for Android/iOS developers. The collection consists of UI elements and styles based on Material Design Guidelines';
 
@@ -93,9 +101,6 @@ const mpAppName = 'Music PodCast';
 const OneSignalId = '610492cb-f697-43cf-af0a-4c6461508157';
 
 //stripe
-const stripePaymentKey = 'sk_test_51GrhA2Bz1ljKAgF9FIJPLupBUCHFCOy5rS6LCnYHSu6Od0Qyx3TElGbxIu8BGRvq14fgidGOYyNkQPivZGnzWoVt004fCZxVdk';
-const STRIPE_PAYMENT_PUBLISH_KEY = 'pk_test_51GrhA2Bz1ljKAgF98fI6WfB2YUn4CewOB0DNQC1pSeXspUc1LlUYs3ou19oPF0ATcqa52FXTYmv6v0mkvPZb9BSD00SUpBj9tI';
-const stripeURL = 'https://api.stripe.com/v1/payment_intents';
 
 ///FlutterWave
 const flutterWavePublicKey = 'FLWPUBK_TEST-eb3edef083c890a7e2243ec9e0daa5-X';
