@@ -189,11 +189,11 @@ class LoginState extends State<Login> {
       }).then((value) async {
         if (value != null) {
           if (value["message"] == "Login successful") {
+            print(value["user"]);
             SharedPreferences prefs = await SharedPreferences.getInstance();
             user = value["user"];
             prefs.setString("user", jsonEncode(value["user"]));
-            Future.delayed(const Duration(seconds: 2), () {
-              finish(context);
+            Future.delayed(const Duration(seconds: 1), () {
               replaceToNextScreen(context, const Home());
             });
             showSuccessPopup(context, value["message"]);

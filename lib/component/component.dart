@@ -2,10 +2,80 @@ import 'dart:io';
 
 import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/setting.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:nb_utils/nb_utils.dart';
+
+Future pilihanModal(BuildContext context, List<Widget> pilihan) {
+  return showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: new Column(mainAxisSize: MainAxisSize.min, children: pilihan),
+        );
+      });
+}
+
+List<Widget> pilihan(Function(File)? onImagePicked) {
+  return [
+    ListTile(
+      leading: new Icon(Icons.camera),
+      title: new Text('Camera'),
+      onTap: () async {
+        final file = await pickImageFromCamera();
+        if (file != null) onImagePicked?.call(file);
+      },
+    ),
+    ListTile(
+      leading: new Icon(Icons.image),
+      title: const Text('Gallery'),
+      onTap: () async {
+        final file = await pickImageFromGallery();
+        if (file != null) onImagePicked?.call(file);
+      },
+    ),
+  ];
+}
+
+final ImagePicker _picker = ImagePicker();
+Future pickImageFromGallery() async {
+  print("object");
+  final XFile? pickedFile =
+      await _picker.pickImage(source: ImageSource.gallery);
+  if (pickedFile != null) {
+    return File(pickedFile.path);
+  } else {
+    return null;
+  }
+}
+
+Future<File?> pickImageFromCamera() async {
+  final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+  if (pickedFile != null) {
+    return File(pickedFile.path);
+  } else {
+    return null;
+  }
+}
+
+Widget submitButton(BuildContext context, void Function()? onPressed,
+    String label, Size? minimumSize) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    child: ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        minimumSize: minimumSize,
+        backgroundColor: kuning,
+        foregroundColor: Colors.black,
+      ),
+      child: Text(label),
+    ),
+  );
+}
 
 Widget datePicker(BuildContext context, ttlCont) {
   return TextFormField(
@@ -40,39 +110,38 @@ Widget datePicker(BuildContext context, ttlCont) {
 
 Widget progressForm(TextEditingController controller, String hint,
     String satuan, BuildContext context) {
-  return Expanded(
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          width: lebar(context) * 0.3,
-          child: TextFormField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                  labelText: hint,
-                  contentPadding: const EdgeInsets.all(16),
-                  border: const OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: merah),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: hitam),
-                  ))),
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Expanded(
-          child: Text(satuan,
-              style: const TextStyle(
-                  fontSize: 16, color: hitam, fontWeight: FontWeight.bold)),
-        ),
-      ],
-    ),
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Container(
+        padding: const EdgeInsets.only(left: 40.0),
+        width: lebar(context) * 0.8,
+        child: TextFormField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+                labelText: hint,
+                contentPadding: const EdgeInsets.all(16),
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: const BorderSide(color: merah),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: const BorderSide(color: hitam),
+                ))),
+      ),
+      SizedBox(
+        width: 10,
+      ),
+      Expanded(
+        child: Text(satuan,
+            style: const TextStyle(
+                fontSize: 16, color: hitam, fontWeight: FontWeight.bold)),
+      ),
+    ],
   );
 }
 
@@ -115,9 +184,9 @@ Widget passwordLogin(TextEditingController passwordController) {
 
 Widget buildTextField(String label, TextEditingController controller,
     {bool isPassword = false,
-    obscureText = false,
+    obscureText = true,
     TextInputType inputType = TextInputType.text,
-    Function? suffixIcononChanged,
+    VoidCallback? suffixIcononChanged,
     bool email = false}) {
   return TextFormField(
     autocorrect: true,
@@ -144,12 +213,12 @@ Widget buildTextField(String label, TextEditingController controller,
         borderSide: const BorderSide(color: hitam),
       ),
       suffixIcon: isPassword
-          ? Icon(!obscureText ? Icons.visibility : Icons.visibility_off)
-              .onTap(() {
-              suffixIcononChanged != null ? suffixIcononChanged('') : null;
-              // setState(() => obscureText = !obscureText
-              // );
-            })
+          ? IconButton(
+              icon: Icon(
+                obscureText ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: suffixIcononChanged,
+            )
           : null,
     ),
   );
@@ -233,35 +302,67 @@ Future cekDanKirimLokasi(BuildContext context) async {
   return true;
 }
 
-Widget dropdownProgress(
+Widget dropdownProgressDI(
+  context,
   List list, {
   bool isPassword = false,
   TextInputType inputType = TextInputType.text,
-  Function(Object?)? onChanged,
+  Function(String?)? onChanged,
+  String? nilai,
   String? hintText,
 }) {
-  return Expanded(
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border.all(color: hitam),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: DropdownButtonFormField(
-        validator: (value) => value == null ? 'Harap pilih salah satu' : null,
-        isExpanded: true,
-        items: list.map((value) {
-          return DropdownMenuItem(
-            value: value.toString(),
-            child: Text(value['nama'].toString(),
-                style: const TextStyle(color: hitam)),
-          );
-        }).toList(),
-        // value: Dataunit,
-        onChanged: (value) {},
+  return Container(
+    width: lebar(context) * 0.7,
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      border: Border.all(color: hitam),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: DropdownButtonFormField<String>(
+      validator: (value) => value == null ? 'Harap pilih salah satu' : null,
+      isExpanded: true,
+      items: list.map<DropdownMenuItem<String>>((value) {
+        return DropdownMenuItem(
+          value: value.toString(),
+          child: Text(value.toString(), style: const TextStyle(color: hitam)),
+        );
+      }).toList(),
+      value: nilai,
+      onChanged: onChanged,
+      hint: Text(hintText ?? 'Select an option'),
+    ),
+  );
+}
 
-        hint: Text(hintText ?? 'Select an option'),
-      ),
+Widget dropdownProgress(
+  context,
+  List list, {
+  bool isPassword = false,
+  TextInputType inputType = TextInputType.text,
+  Function(String?)? onChanged,
+  String? nilai,
+  String? hintText,
+}) {
+  return Container(
+    width: lebar(context) * 0.7,
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      border: Border.all(color: hitam),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: DropdownButtonFormField<String>(
+      validator: (value) => value == null ? 'Harap pilih salah satu' : null,
+      isExpanded: true,
+      items: list.map<DropdownMenuItem<String>>((value) {
+        return DropdownMenuItem(
+          value: value['id'].toString(),
+          child: Text(value['nama'].toString(),
+              style: const TextStyle(color: hitam)),
+        );
+      }).toList(),
+      value: nilai,
+      onChanged: onChanged,
+      hint: Text(hintText ?? 'Select an option'),
     ),
   );
 }
@@ -294,6 +395,58 @@ Widget dropdownField(
       hint: const Text('Select an option'),
     ),
   );
+}
+
+Widget profileCard(BuildContext context, {Widget? profileView}) {
+  return Container(
+    height: tinggi(context) * 0.22,
+    width: lebar(context),
+    decoration: const BoxDecoration(
+      boxShadow: [
+        BoxShadow(
+            color: hitam,
+            spreadRadius: 0.1,
+            blurRadius: 2,
+            offset: const Offset(0, 2))
+      ],
+      color: kuning,
+      borderRadius: BorderRadius.only(
+        bottomLeft: Radius.circular(30),
+        bottomRight: Radius.circular(30),
+      ),
+    ),
+    child: Column(
+      children: [
+        70.height,
+        if (profileView != null) profileView,
+      ],
+    ),
+  );
+}
+
+Decoration shadowCard() {
+  return BoxDecoration(
+    color: putih,
+    boxShadow: [
+      BoxShadow(
+          color: hitam,
+          spreadRadius: 2,
+          blurRadius: 5,
+          offset: const Offset(0, 5))
+    ],
+    borderRadius: const BorderRadius.all(Radius.circular(16)),
+  );
+}
+
+void loadingPopup(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return LoadingAnimationWidget.fourRotatingDots(
+          color: kuning,
+          size: 200,
+        );
+      });
 }
 
 void showSuccessPopup(BuildContext context, String message) {
@@ -339,6 +492,71 @@ void showSuccessPopup(BuildContext context, String message) {
                     children: [
                       const SizedBox(height: 20),
                       Text(message,
+                          style: const TextStyle(
+                              fontSize: 18,
+                              color: putih,
+                              fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      });
+}
+
+void showMaintenancePopup(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: transparentColor,
+          child: SingleChildScrollView(
+            physics: const ScrollPhysics(),
+            child: Column(
+              children: [
+                Container(
+                  height: tinggi(context) * 0.15,
+                  width: lebar(context) * 0.8,
+                  decoration: const BoxDecoration(
+                    color: putih,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                  ),
+                  // padding: EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/road-block.png',
+                          height: 120, width: 120, fit: BoxFit.cover),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: tinggi(context) * 0.15,
+                  width: lebar(context) * 0.8,
+                  decoration: const BoxDecoration(
+                    color: biru,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Text("Fitur ini sedang dalam perbaikan",
                           style: const TextStyle(
                               fontSize: 18,
                               color: putih,

@@ -19,10 +19,20 @@ class _JamState extends State<Jam> {
   @override
   String outputnip = "";
   TextEditingController nipText = TextEditingController();
+  late DateTime now;
+  late String hari;
+  late String tanggal;
 
   @override
   void initState() {
     super.initState();
+    now = DateTime.now();
+    hari = DateFormat('EEEE', 'id_ID').format(now); // Hari (Senin, Selasa, dst)
+    tanggal = DateFormat('d MMMM yyyy', 'id_ID').format(now);
+    setState(() {
+      masuk;
+      keluar;
+    });
   }
 
   @override
@@ -57,8 +67,13 @@ class _JamState extends State<Jam> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("NIP"),
-                        Expanded(child: Text(outputnip))
+                        Text(hari + " , " + tanggal,
+                            style: GoogleFonts.roboto(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              textStyle: Theme.of(context).textTheme.bodyMedium,
+                            ))
                       ],
                     ),
                   ),
@@ -109,6 +124,7 @@ class _JamState extends State<Jam> {
                               ),
                               GestureDetector(
                                 onTap: () async {
+                                  loadingPopup(context);
                                   cekDanKirimLokasi(context).then((value) {
                                     if (value == true) {
                                       absen(context, "masuk").then((onValue) {
@@ -123,7 +139,7 @@ class _JamState extends State<Jam> {
                                   });
                                 },
                                 child: loginButton(
-                                    "Absen Masuk", birumuda, Colors.black),
+                                    "Absen Masuk", kuning, Colors.black),
                               ),
                             ],
                           ),
@@ -156,6 +172,7 @@ class _JamState extends State<Jam> {
                               ),
                               GestureDetector(
                                 onTap: () async {
+                                  loadingPopup(context);
                                   cekDanKirimLokasi(context).then((value) {
                                     if (value == true) {
                                       absen(context, "keluar").then((onValue) {
@@ -170,7 +187,7 @@ class _JamState extends State<Jam> {
                                   });
                                 },
                                 child: loginButton(
-                                    "Absen Keluar", birumuda, Colors.black),
+                                    "Absen Keluar", kuning, Colors.black),
                               ),
                             ],
                           ),

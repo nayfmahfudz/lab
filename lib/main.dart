@@ -9,9 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await initializeService();
-  initializeDateFormatting('id_ID', null).then((_) => runApp(const MyApp()));
+  await initializeDateFormatting('id_ID', null)
+      .then((_) => runApp(const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -29,18 +28,27 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future splashscreen() async {
-    return await Future.delayed(const Duration(seconds: 4), () async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      user = prefs.getString("user") != null
-          ? jsonDecode(prefs.getString("user").toString())
-          : {};
-      // ignore: unnecessary_null_comparison
-      if (user.isNotEmpty && user != null && user != {}) {
+    try {
+      return await Future.delayed(const Duration(seconds: 3), () async {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        user = prefs.getString("user") != null
+            ? jsonDecode(prefs.getString("user").toString())
+            : {};
+        print(user);
+        // ignore: unnecessary_null_comparison
+        if (user.length != 0) {
+          return true;
+        } else {
+          return true;
+        }
+      });
+    } catch (e) {
+      if (user.length != 0) {
         return true;
       } else {
         return true;
       }
-    });
+    }
   }
 
   @override

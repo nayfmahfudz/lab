@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:Absen_BBWS/api.dart';
 import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timelines/timelines.dart';
 
 class ProgressLapanngan extends StatefulWidget {
@@ -16,14 +20,97 @@ class ProgressLapanngan extends StatefulWidget {
 class _ProgressLapannganState extends State<ProgressLapanngan> {
   @override
   // ignore: override_on_non_overriding_member
+  // Tambahkan deklarasi TextEditingController di sini
+  final TextEditingController angkatSedimenController = TextEditingController();
+  final TextEditingController menutupBocoranController =
+      TextEditingController();
+  final TextEditingController panjangSaluranController =
+      TextEditingController();
+  final TextEditingController luasAreaController = TextEditingController();
+  final TextEditingController potongPohonController = TextEditingController();
+  final TextEditingController pengecatanPintuController =
+      TextEditingController();
+  final TextEditingController pembersihanSampahController =
+      TextEditingController();
+  final TextEditingController pelumasanPintuController =
+      TextEditingController();
+  final TextEditingController TMA = TextEditingController();
+  final TextEditingController WK = TextEditingController();
+  final TextEditingController debit = TextEditingController();
+
+  @override
   List listProgress = [0, 1, 50, 100];
+  @override
   void _nextStep() {
-    progress(context, currentStep);
-    setState(() {
-      if (currentStep < listProgress.length) {
-        currentStep++;
+    try {
+      final Map<String, dynamic> data = {};
+
+      void addIfNotEmpty(String key, String? value) {
+        if (value != null && value.trim().isNotEmpty) {
+          data[key] = value.trim();
+        }
       }
-    });
+
+      addIfNotEmpty("TMA", TMA.text);
+      addIfNotEmpty("debit", debit.text);
+      addIfNotEmpty("angkat_sedimen", angkatSedimenController.text);
+      addIfNotEmpty("menutup_bocoran", menutupBocoranController.text);
+      addIfNotEmpty("panjang_saluran", panjangSaluranController.text);
+      addIfNotEmpty("luas_area_kegiatan", luasAreaController.text);
+      addIfNotEmpty("angkat_potong_pohon", potongPohonController.text);
+      addIfNotEmpty("pengecatan_pintu_air", pengecatanPintuController.text);
+      addIfNotEmpty("pembersihan_sampah", pembersihanSampahController.text);
+      addIfNotEmpty("pelumasan_pintu_air", pelumasanPintuController.text);
+      addIfNotEmpty("wilayah_kerja", WK.text);
+
+      if (valueDI != null && valueDI.toString().trim().isNotEmpty) {
+        data["DI"] = valueDI;
+      }
+
+      if (valueKota != null && valueKota.trim().isNotEmpty) {
+        final found = jawaTimur
+            .where((item) => item['id'].toString() == valueKota)
+            .toList();
+        if (found.isNotEmpty && found.first['nama'] != null) {
+          data["kota"] = found.first['nama'];
+        }
+      }
+
+      if (valueKecamatan != null && valueKecamatan.trim().isNotEmpty) {
+        final found = kecamatan
+            .where((item) => item['id'].toString() == valueKecamatan)
+            .toList();
+        if (found.isNotEmpty && found.first['nama'] != null) {
+          data["kecamatan"] = found.first['nama'];
+        }
+      }
+
+      if (valueKelurahan != null && valueKelurahan.trim().isNotEmpty) {
+        final found = kelurahan
+            .where((item) => item['id'].toString() == valueKelurahan)
+            .toList();
+        if (found.isNotEmpty && found.first['nama'] != null) {
+          data["kelurahan"] = found.first['nama'];
+        }
+      }
+
+      progress(context, currentStep, data).then((onValue) => {
+            if (onValue["status"] == "Success")
+              {
+                setState(() {
+                  if (currentStep < listProgress.length) {
+                    currentStep++;
+                  }
+                }),
+                showSuccessPopup(context, onValue["message"]),
+              }
+            else
+              {showFailPopup(context, onValue["message"])}
+          });
+    } catch (e) {
+      print(e);
+      showFailPopup(context, "Pastikan semua data terisi!");
+    }
   }
 
   @override
@@ -135,16 +222,16 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
                 )),
             const SizedBox(height: 50),
             formProgress(context),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: ElevatedButton(
-                onPressed:
-                    currentStep == listProgress.length - 1 ? null : _nextStep,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: birumuda,
-                  foregroundColor: Colors.black,
-                ),
-                child: const Text('Laporkan Progress'),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  currentStep == listProgress.length - 1 ? null : _nextStep();
+                });
+              },
+              child: Container(
+                height: tinggi(context) * 0.05,
+                width: lebar(context) * 0.4,
+                child: loginButton("Laporkan Progress", kuning, Colors.black),
               ),
             ),
             SizedBox(
@@ -157,45 +244,64 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
   }
 
   Widget formProgress(BuildContext context) {
-    return Column(
-      children: [
-        rowDropdownForm(
-          jawaTimur,
-          ['Pilih Lokasi', 'Pilih Lokasi'],
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: putih,
+          boxShadow: [
+            BoxShadow(
+                color: hitam,
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 5))
+          ],
+          borderRadius: BorderRadius.all(Radius.circular(16)),
         ),
-        containerForm(
-          TextEditingController(),
-          TextEditingController(),
-          "Angkat Sedimen",
-          "Menutup Bocoran",
-          "m3",
-          "bh",
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: lebar(context) * 0.06),
+            rowDropdownFormDi(di, valueDI),
+            rowDropdownForm(
+              jawaTimur,
+              valueKota,
+              "kecamatan",
+            ),
+            rowDropdownForm(kecamatan, valueKecamatan, "kelurahan"),
+            rowDropdownForm(kelurahan, valueKelurahan, ""),
+            progressForm(WK, "Wilayah Kerja", "", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(TMA, "Tinggi Muka Air", "cm", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(debit, "Debit", "m\u00B3", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(
+                angkatSedimenController, "Angkat Sedimen", "m\u00B3", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(
+                menutupBocoranController, "Menutup Bocoran", "bh", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(
+                panjangSaluranController, "Panjang Saluran", "m", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(luasAreaController, "Luas Area", "m\u00B2", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(potongPohonController, "potong pohon", "bh", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(
+                pengecatanPintuController, "Pengecatan Pintu", "bh", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(pembersihanSampahController, "Pembersihan Sampah",
+                "kg", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(
+                pelumasanPintuController, "Pelumasan Pintu", "bh", context),
+            SizedBox(height: lebar(context) * 0.12),
+          ],
         ),
-        containerForm(
-          TextEditingController(),
-          TextEditingController(),
-          "Panjang Saluran",
-          "Luas Area",
-          "m",
-          "m2",
-        ),
-        containerForm(
-          TextEditingController(),
-          TextEditingController(),
-          "potong pohon",
-          "Pengecatan Pintu",
-          "bh",
-          "bh",
-        ),
-        containerForm(
-          TextEditingController(),
-          TextEditingController(),
-          "Pembersihan Sampah",
-          "Pelumasan Pintu",
-          "kg",
-          "bh",
-        ),
-      ],
+      ),
     );
   }
 
@@ -221,17 +327,60 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
     );
   }
 
-  Widget rowDropdownForm(List items1, List items2) {
+  Widget rowDropdownFormDi(List items1, String nilai) {
     return Container(
       height: tinggi(context) * 0.1,
-      width: lebar(context) * 0.85,
-      padding: const EdgeInsets.only(left: 10.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          dropdownProgress(items1),
-          SizedBox(width: lebar(context) * 0.12),
-          dropdownProgress([]),
-          SizedBox(width: lebar(context) * 0.12),
+          dropdownProgressDI(context, items1, nilai: nilai,
+              onChanged: (String? value) async {
+            final prefs = await SharedPreferences.getInstance();
+            nilai = value!;
+            prefs.setString("valueDI", jsonEncode(value));
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget rowDropdownForm(List items1, String nilai, String nilaidaerah) {
+    return Container(
+      height: tinggi(context) * 0.1,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          dropdownProgress(context, items1, nilai: nilai,
+              onChanged: (String? value) async {
+            print(value);
+            final onValue =
+                await daerah(context, nilaidaerah, int.parse(value!));
+            final prefs = await SharedPreferences.getInstance();
+            nilai = value;
+            if (nilaidaerah == "kecamatan") {
+              kecamatan = onValue;
+              valueKecamatan = onValue[0]['id'].toString();
+              prefs.setString("valueKota", jsonEncode(value));
+              prefs.setString(nilaidaerah, jsonEncode(kecamatan));
+              prefs.setString("valuekecamatan", jsonEncode(valueKecamatan));
+            } else if (nilaidaerah == "kelurahan") {
+              kelurahan = onValue;
+              prefs.setString("valuekecamatan", jsonEncode(value));
+              valueKelurahan = onValue[0]['id'].toString();
+              prefs.setString(nilaidaerah, jsonEncode(kelurahan));
+              prefs.setString("valuekelurahan", jsonEncode(valueKelurahan));
+            } else {
+              prefs.setString("valuekelurahan", jsonEncode(value));
+            }
+            // }
+            setState(() {
+              kelurahan;
+              kecamatan;
+              nilai;
+            });
+          }),
         ],
       ),
     );

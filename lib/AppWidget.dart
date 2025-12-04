@@ -122,13 +122,12 @@ Widget settingItem(context, String text,
                   child: leading ?? const SizedBox()),
               leading != null ? 10.width : const SizedBox(),
               Text(text,
-                      style: primaryTextStyle(
-                          size: textSize ?? 18, color: birumuda))
+                      style:
+                          primaryTextStyle(size: textSize ?? 18, color: hitam))
                   .expand(),
             ],
           ).expand(),
-          detail ??
-              const Icon(Icons.arrow_forward_ios, size: 16, color: birumuda),
+          detail ?? const Icon(Icons.arrow_forward_ios, size: 16, color: hitam),
         ],
       ).paddingOnly(left: 16, right: 16, top: 8, bottom: 8),
     ),

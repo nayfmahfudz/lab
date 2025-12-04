@@ -34,28 +34,19 @@ class DaftarState extends State<Daftar> {
   final ttlCont = TextEditingController();
   final domisiliCont = TextEditingController();
   final unitCont = TextEditingController();
+  final NIK = TextEditingController();
   var Dataunit = "";
   var petugaslapangan = "";
+  var jabatan = "";
   List Listunit = [];
   File? _image;
-  final ImagePicker _picker = ImagePicker();
-  Future<void> _pickImageFromGallery() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-    }
-  }
+  File? _KTP;
 
-  Future<void> _pickImageFromCamera() async {
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
+  void setImage(String value, File file) {
+    if (value == "foto") {
+      _image = file;
+    } else {
+      _KTP = file;
     }
   }
 
@@ -73,6 +64,32 @@ class DaftarState extends State<Daftar> {
     super.initState();
   }
 
+  // pilihan(value) {
+  //   return [
+  //     ListTile(
+  //         leading: new Icon(Icons.camera),
+  //         title: new Text('Camera'),
+  //         onTap: () => pickImageFromCamera(getImage(value)).then(
+  //               (value) {
+  //                 setState(() {
+  //                   _image = value;
+  //                 });
+  //               },
+  //             )),
+  //     ListTile(
+  //       leading: new Icon(Icons.image),
+  //       title: new Text('Gallery'),
+  //       onTap: () => pickImageFromGallery(getImage(value)).then((value) {
+  //         setState(() {
+  //           index;
+  //           _KTP = value;
+  //         });
+  //       }),
+  //     ),
+  //   ];
+  // }
+
+  int index = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,16 +104,7 @@ class DaftarState extends State<Daftar> {
                 children: [
                   80.height,
                   Container(
-                    decoration: BoxDecoration(
-                        color: putih,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                              color: black.withOpacity(0.2),
-                              spreadRadius: 5,
-                              blurRadius: 20,
-                              offset: const Offset(0, 20))
-                        ]),
+                    decoration: shadowCard(),
                     width: 500,
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(16),
@@ -109,7 +117,13 @@ class DaftarState extends State<Daftar> {
                           Center(
                             child: GestureDetector(
                               onTap: () {
-                                _pickImageFromCamera();
+                                pilihanModal(context, pilihan(
+                                  (value) {
+                                    setState(() {
+                                      setImage("foto", value);
+                                    });
+                                  },
+                                ));
                               },
                               child: CircleAvatar(
                                 radius: 70.0,
@@ -123,6 +137,41 @@ class DaftarState extends State<Daftar> {
                             ),
                           ),
                           30.height,
+                          GestureDetector(
+                            onTap: () {
+                              pilihanModal(context, pilihan(
+                                (value) {
+                                  setState(() {
+                                    setImage("KTP", value);
+                                    index = 1;
+                                  });
+                                },
+                              ));
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color:
+                                      index == 1 ? biru : Colors.red.shade100,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              width: lebar(context) * 0.26,
+                              height: tinggi(context) * 0.05,
+                              child: Center(
+                                child: Text(
+                                  index == 1 ? 'Terupload' : 'Upload KTP',
+                                  style: const TextStyle(
+                                    color: hitam,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                          16.height,
+                          buildTextField('NIK', NIK),
+                          16.height,
                           buildTextField('First Name', firstNameCont),
                           16.height,
                           buildTextField('Last Name', lastNameCont),
@@ -132,27 +181,43 @@ class DaftarState extends State<Daftar> {
                               email: true),
                           16.height,
                           buildTextField('Password', passwordCont,
-                              isPassword: true),
+                              obscureText: obscureText,
+                              isPassword: true, suffixIcononChanged: () {
+                            setState(() {
+                              obscureText = !obscureText;
+                            });
+                          }),
                           16.height,
-                          buildTextField('Sekolah', sekolahCont),
+                          buildTextField(
+                              'Sekolah/Perguruan Tinggi', sekolahCont),
                           16.height,
                           buildTextField('Alamat', alamatCont),
                           16.height,
                           dropdownFieldphs(
-                            ["Petugas OP", "PHS"],
+                            ["Petugas OP", "Tenaga Pendukung"],
                             onChanged: (newValue) {
-                              if (newValue == "Petugas OP") {
-                                setState(() {
-                                  petugaslapangan = "1";
-                                });
-                              } else {
+                              if (newValue == "Tenaga Pendukung") {
                                 setState(() {
                                   petugaslapangan = "0";
                                 });
+                              } else {
+                                setState(() {
+                                  petugaslapangan = "1";
+                                });
                               }
-                              print(petugaslapangan);
                             },
                           ),
+                          petugaslapangan == "1" ? 16.height : Container(),
+                          petugaslapangan == "1"
+                              ? dropdownFieldphs(
+                                  ["PPA", "Pekarya", "PPA POB", "Pekarya POB"],
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      jabatan = newValue.toString();
+                                    });
+                                  },
+                                )
+                              : Container(),
                           16.height,
                           buildTextField('Pendidikan Terakhir', pendidikanCont),
                           16.height,
@@ -197,6 +262,8 @@ class DaftarState extends State<Daftar> {
                       showFailPopup(
                           context, "Mohon isi semua field yang wajib");
                     } else {
+                      if (!checkValues()) return;
+
                       daftar(context, {
                         "firstName": firstNameCont.text,
                         "lastName": lastNameCont.text,
@@ -211,13 +278,15 @@ class DaftarState extends State<Daftar> {
                         "domisili": domisiliCont.text,
                         "unit": Dataunit,
                         "foto": _image,
+                        "ktp": _KTP,
+                        "jabatan": jabatan,
+                        "nik": NIK.text,
                       }).then((value) {
                         print(value);
                         if (value is Map) {
                           if (value['status'] == "Success") {
                             showSuccessPopup(context, value['message']);
                             Future.delayed(const Duration(seconds: 2), () {
-                              finish(context);
                               replaceToNextScreen(context, const Login());
                             });
                           } else {
@@ -240,5 +309,36 @@ class DaftarState extends State<Daftar> {
         ),
       ),
     );
+  }
+
+  bool checkValues() {
+    List<String> missing = [];
+
+    if (NIK.text.trim().isEmpty) missing.add("NIK");
+    if (firstNameCont.text.trim().isEmpty) missing.add("First Name");
+    if (lastNameCont.text.trim().isEmpty) missing.add("Last Name");
+    if (emailCont.text.trim().isEmpty) missing.add("Email");
+    if (passwordCont.text.trim().isEmpty) missing.add("Password");
+    if (sekolahCont.text.trim().isEmpty)
+      missing.add("Sekolah/Perguruan Tinggi");
+    if (alamatCont.text.trim().isEmpty) missing.add("Alamat");
+    if (petugaslapangan.trim().isEmpty) missing.add("Jenis Petugas");
+    if (pendidikanCont.text.trim().isEmpty) missing.add("Pendidikan Terakhir");
+    if (jurusanCont.text.trim().isEmpty) missing.add("Jurusan");
+    if (ttlCont.text.trim().isEmpty) missing.add("TTL");
+    if (domisiliCont.text.trim().isEmpty) missing.add("Domisili");
+
+    // pastikan Dataunit berisi id unit, fallback ke controller jika belum di-set
+    if (Dataunit.isEmpty) Dataunit = unitCont.text;
+    if (Dataunit.trim().isEmpty) missing.add("Unit");
+
+    if (_image == null) missing.add("Foto");
+    if (_KTP == null) missing.add("KTP");
+
+    if (missing.isNotEmpty) {
+      showFailPopup(context, "Mohon lengkapi: ${missing.join(', ')}");
+      return false;
+    }
+    return true;
   }
 }

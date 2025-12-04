@@ -788,7 +788,13 @@ Widget loginButton(String text, Color warna, Color textwarna) {
       decoration: BoxDecoration(
         color: warna,
         borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-        // shadowColor: Color.fromRGBO(237, 155, 12, 1),
+        boxShadow: [
+          BoxShadow(
+              color: hitam,
+              spreadRadius: 1,
+              blurRadius: 1,
+              offset: const Offset(0, 1))
+        ],
       ),
       child: Center(
           child: Text(text,

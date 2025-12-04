@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:flutter/services.dart';
@@ -11,26 +10,44 @@ import 'package:geolocator/geolocator.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 final ImagePicker _picker = ImagePicker();
+Future edit(BuildContext context, Map<String, dynamic> user) async {
+  try {
+    FormData formData = FormData.fromMap(user);
+    var response = await Dio().put('$url/users',
+        data: formData,
+        options: Options(headers: {
+          "Content-Type": "multipart/form-data",
+          "Accept": "application/json",
+        }));
+    print(response.data);
+    if (response.statusCode == 200) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      showSuccessPopup(context, response.data["message"]);
+      user = response.data["data"];
+      prefs.setString("user", jsonEncode(user));
+
+      return user;
+    } else
+      return null;
+  } on DioError catch (e) {
+    showFailPopup(context, e.response?.data["message"]);
+    return null;
+  }
+}
+
 Future daftar(BuildContext context, Map user) async {
   try {
-    FormData formData = FormData.fromMap({
-      "firstName": user["firstName"],
-      "lastName": user["lastName"],
-      "password": user["password"],
-      "sekolah": user["sekolah"],
-      "alamat": user["alamat"],
-      "petugas_lapangan": user["petugas_lapangan"],
-      "email": user["email"],
-      "pendidikan_terakhir": user["pendidikan_terakhir"],
-      "jurusan": user["jurusan"],
-      "TTL": user["TTL"],
-      "domisili": user["domisili"],
-      "unit": user["unit"],
-      "foto": user["foto"] != null
-          ? MultipartFile.fromFileSync(user["foto"].path,
-              filename: user["foto"].path.split('/').last)
-          : null,
-    });
+    // Simplified: convert file fields to MultipartFile if present, and remove nulls
+    Map<String, dynamic> payload = Map<String, dynamic>.from(user);
+    for (final key in ['foto', 'ktp']) {
+      final file = user[key];
+      if (file != null) {
+        payload[key] = MultipartFile.fromFileSync(file.path,
+            filename: file.path.split('/').last);
+      }
+    }
+    payload.removeWhere((_, v) => v == null);
+    FormData formData = FormData.fromMap(payload);
     var response = await Dio().post('$url/users',
         data: formData,
         options: Options(headers: {
@@ -47,12 +64,14 @@ Future daftar(BuildContext context, Map user) async {
 
 Future login(BuildContext context, Map data) async {
   try {
+    print("Sss");
     var response = await Dio().post('$url/users/login',
         data: jsonEncode(data),
         options: Options(headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
         }));
+    print(response.data);
     return response.data;
   } on DioError catch (e) {
     // if (e.response?.statusCode != 200) {
@@ -61,21 +80,11 @@ Future login(BuildContext context, Map data) async {
   }
 }
 
-Future daerah(BuildContext context, String daerah, Int kode) async {
+Future daerah(BuildContext context, String daerah, int kode) async {
   try {
-    var UrlDaerah = '';
-    if (daerah == "Kecamatan") {
-      UrlDaerah =
-          'https://ibnux.github.io/data-indonesia/kecamatan/${kode}.json';
-    } else {
-      var response = await Dio().get('$url/daerah',
-          queryParameters: {"daerah": daerah, "kode": kode},
-          options: Options(headers: {
-            "Content-Type": "application/json;charset=UTF-8",
-          }));
-      return response.data;
-    }
-    var response = await Dio().get('$url/units',
+    var UrlDaerah =
+        'https://ibnux.github.io/data-indonesia/${daerah}/${kode}.json';
+    var response = await Dio().get(UrlDaerah,
         options: Options(
             headers: {"Content-Type": "application/json;charset=UTF-8"}));
     return response.data;
@@ -175,33 +184,28 @@ Future absenkeluar(BuildContext context, Map user) async {
   }
 }
 
-Future progress(BuildContext context, int currentPorgress) async {
+Future progress(BuildContext context, int currentPorgress, Map data) async {
   photo = await _picker.pickImage(source: ImageSource.camera);
+  print(data);
   if (photo != null) {
-    progressFetch(context, {
-      "progress_1": currentPorgress == 0
-          ? MultipartFile.fromFileSync(photo!.path,
-              filename: photo?.path.split('/').last)
-          : null,
-      "progress_50": currentPorgress == 1
-          ? MultipartFile.fromFileSync(photo!.path,
-              filename: photo?.path.split('/').last)
-          : null,
-      "progress_100": currentPorgress == 2
-          ? MultipartFile.fromFileSync(photo!.path,
-              filename: photo?.path.split('/').last)
-          : null,
-      "idUser": user["id"],
-    }).then((onValue) => {
-          if (onValue["status"] == "Success")
-            {showSuccessPopup(context, onValue["message"])}
-          else
-            {showFailPopup(context, onValue["message"])}
-        });
+    // Gabungkan data tambahan ke dalam Map data
+    Map<String, dynamic> requestData = Map<String, dynamic>.from(data);
+    if (currentPorgress == 0) {
+      requestData["progress_1"] = MultipartFile.fromFileSync(photo!.path,
+          filename: photo?.path.split('/').last);
+    } else if (currentPorgress == 1) {
+      requestData["progress_50"] = MultipartFile.fromFileSync(photo!.path,
+          filename: photo?.path.split('/').last);
+    } else if (currentPorgress == 2) {
+      requestData["progress_100"] = MultipartFile.fromFileSync(photo!.path,
+          filename: photo?.path.split('/').last);
+    }
+    requestData["idUser"] = user["id"];
+
+    return progressFetch(context, requestData).then((onValue) {
+      return onValue;
+    });
   }
-  Future.delayed(const Duration(seconds: 3), () {
-    finish(context);
-  });
   photo = null;
 }
 
@@ -213,14 +217,14 @@ Future absen(BuildContext context, String absen) async {
 
   Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high);
-
+  finish(context);
   photo = await _picker.pickImage(source: ImageSource.camera);
   if (absen == "masuk" && photo != null) {
     absenmasuk(context, {
       "latitude": position.latitude.toString(),
       "longtitude": position.longitude.toString(),
       "created": DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
-      "foto": photo != null
+      "absen": photo != null
           ? MultipartFile.fromFileSync(photo!.path,
               filename: photo?.path.split('/').last)
           : null,
@@ -240,7 +244,7 @@ Future absen(BuildContext context, String absen) async {
       "latitude": position.latitude.toString(),
       "longtitude": position.longitude.toString(),
       "created": DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
-      "foto": photo != null
+      "absen": photo != null
           ? MultipartFile.fromFileSync(photo!.path,
               filename: photo?.path.split('/').last)
           : null,
@@ -256,15 +260,45 @@ Future absen(BuildContext context, String absen) async {
             {showFailPopup(context, onValue["message"])}
         });
   }
-  Future.delayed(const Duration(seconds: 3), () {
-    finish(context);
-  });
   photo = null;
+}
+
+Future<void> loadJsonDI() async {
+  String jsonString = await rootBundle.loadString("assets/DI.json");
+  final prefs = await SharedPreferences.getInstance();
+  di = jsonDecode(jsonString) ?? [];
+  valueDI = (prefs.getString("valueDI") == null ||
+          prefs.getString("valueDI")!.isEmpty)
+      ? di[0]
+      : jsonDecode(prefs.getString("valueDI").toString()).toString();
 }
 
 Future<void> loadJson() async {
   String jsonString = await rootBundle.loadString("assets/jawatimur.json");
+  final prefs = await SharedPreferences.getInstance();
   jawaTimur = jsonDecode(jsonString) ?? [];
+  String? valueKotaPref = prefs.getString("valueKota");
+  print(valueKotaPref);
+  valueKota = (valueKotaPref == null || valueKotaPref.isEmpty)
+      ? jawaTimur[0]['id']
+      : jsonDecode(valueKotaPref).toString();
+
+  if (prefs.getString("kecamatan") != null) {
+    kecamatan = jsonDecode(prefs.getString("kecamatan")!).toList();
+    prefs.getString("valuekecamatan") != null
+        ? valueKecamatan =
+            jsonDecode(prefs.getString("valuekecamatan").toString())
+        : valueKecamatan =
+            kecamatan.isNotEmpty ? kecamatan[0]['id'].toString() : "";
+  }
+  if (prefs.getString("kelurahan") != null) {
+    kelurahan = jsonDecode(prefs.getString("kelurahan")!).toList();
+    prefs.getString("valuekelurahan") != null
+        ? valueKelurahan =
+            jsonDecode(prefs.getString("valuekelurahan").toString())
+        : valueKelurahan =
+            kelurahan.isNotEmpty ? kelurahan[0]['id'].toString() : "";
+  }
 }
 
 Future cekData(idUser) async {
@@ -276,22 +310,30 @@ Future cekData(idUser) async {
             "Accept": "application/json",
           }))
       .then((onValue) {
-    if (onValue.data["status"] == "Success" &&
-        onValue.data["data"]["progress"] != null &&
-        onValue.data["data"]["progress"] != "null") {
+    if (onValue.data["status"] == "Success") {
+      print(onValue.data);
       if (onValue.data["data"]["masuk"] != null &&
           onValue.data["data"]["masuk"].isNotEmpty) {
         DateTime parsed = DateTime.parse(
-            onValue.data["data"]["masuk"]["createdAt"].toString());
+                onValue.data["data"]["masuk"]["createdAt"].toString())
+            .toLocal();
         masuk = DateFormat('HH:mm').format(parsed);
       }
       if (onValue.data["data"]["keluar"] != null &&
           onValue.data["data"]["keluar"].isNotEmpty) {
         DateTime parsed = DateTime.parse(
-            onValue.data["data"]["keluar"]["createdAt"].toString());
+                onValue.data["data"]["keluar"]["createdAt"].toString())
+            .toLocal();
         keluar = DateFormat('HH:mm').format(parsed);
       }
-      currentStep = int.parse(onValue.data["data"]["progress"].toString());
+      if (onValue.data["data"]["progress"] != null &&
+          onValue.data["data"]["progress"] != "null") {
+        currentStep = int.parse(onValue.data["data"]["progress"].toString());
+      }
+      if (onValue.data["data"]["progress"] == null ||
+          onValue.data["data"]["progress"] == "null") {
+        currentStep = 0;
+      }
     }
   }).catchError((e) {});
 }
