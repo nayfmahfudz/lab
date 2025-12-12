@@ -36,11 +36,11 @@ class _MyAppState extends State<MyApp> {
             : {};
         print(user);
         // ignore: unnecessary_null_comparison
-        if (user.length != 0) {
-          return true;
-        } else {
-          return true;
-        }
+        // if (user.length != 0) {
+        return true;
+        // } else {
+        //   return true;
+        // }
       });
     } catch (e) {
       if (user.length != 0) {

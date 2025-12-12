@@ -109,7 +109,8 @@ Widget datePicker(BuildContext context, ttlCont) {
 }
 
 Widget progressForm(TextEditingController controller, String hint,
-    String satuan, BuildContext context) {
+    String satuan, BuildContext context,
+    {bool enabled = true}) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.center,
@@ -119,7 +120,7 @@ Widget progressForm(TextEditingController controller, String hint,
         width: lebar(context) * 0.8,
         child: TextFormField(
             controller: controller,
-            keyboardType: TextInputType.number,
+            keyboardType: enabled ? TextInputType.number : TextInputType.text,
             decoration: InputDecoration(
                 labelText: hint,
                 contentPadding: const EdgeInsets.all(16),
