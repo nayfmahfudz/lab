@@ -7,6 +7,7 @@ import 'package:Absen_BBWS/setting.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timelines/timelines.dart';
 
@@ -52,6 +53,8 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       }
 
       addIfNotEmpty("TMA", TMA.text);
+      addIfNotEmpty("longitude", longitude.text);
+      addIfNotEmpty("latitude", latitude.text);
       addIfNotEmpty("debit", debit.text);
       addIfNotEmpty("angkat_sedimen", angkatSedimenController.text);
       addIfNotEmpty("menutup_bocoran", menutupBocoranController.text);
@@ -113,7 +116,6 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
     }
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -278,9 +280,9 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
             rowDropdownForm(kelurahan, valueKelurahan, ""),
             progressForm(WK, "Wilayah Kerja", "", context, enabled: false),
             SizedBox(height: lebar(context) * 0.05),
-            progressForm(WK, "latitude ", "", context),
+            progressForm(latitude, "latitude ", "", context),
             SizedBox(height: lebar(context) * 0.05),
-            progressForm(WK, "longitude", "", context),
+            progressForm(longitude, "longitude", "", context),
             SizedBox(height: lebar(context) * 0.05),
             progressForm(TMA, "Tinggi Muka Air", "cm", context),
             SizedBox(height: lebar(context) * 0.05),

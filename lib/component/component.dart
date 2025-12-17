@@ -271,6 +271,39 @@ Widget dropdownFieldphs(
   );
 }
 
+Future cekLokasi(BuildContext context) async {
+  // Cek apakah GPS aktif
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    showFailPopup(context, "GPS tidak aktif. Aktifkan lokasi terlebih dahulu.");
+    return;
+  } else {
+    // Jika GPS aktif, lanjutkan ke pengecekan izin
+    print("GPS aktif");
+  }
+
+  // Cek izin lokasi
+  permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+  }
+
+  if (permission == LocationPermission.deniedForever ||
+      permission == LocationPermission.denied) {
+    showFailPopup(
+        context, "Izin lokasi ditolak. Tidak dapat mengakses lokasi.");
+    return;
+  } else {
+    // Jika izin lokasi diberikan, lanjutkan ke pengambilan lokasi
+    print("Izin lokasi diberikan");
+  }
+
+  return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
+}
+
 Future cekDanKirimLokasi(BuildContext context) async {
   // Cek apakah GPS aktif
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();

@@ -36,4 +36,6 @@ String valueKelurahan = "";
 List kecamatan = [];
 List kelurahan = [];
 int currentStep = 0;
+TextEditingController latitude = TextEditingController();
+TextEditingController longitude = TextEditingController();
 const dateFormat = 'MMM dd, yyyy';

@@ -1,4 +1,5 @@
 import 'package:Absen_BBWS/api.dart';
+import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/jam.dart';
 import 'package:Absen_BBWS/profile.dart';
@@ -7,6 +8,7 @@ import 'package:Absen_BBWS/setting.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -107,8 +109,13 @@ class _HomeState extends State<Home> {
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           selectedIndex: _currentIndex,
           onItemSelected: (index) {
+            cekLokasi(context).then((value) {
+              if (value is Position) {
+                latitude.text = value.latitude.toString();
+                longitude.text = value.longitude.toString();
+              }
+            });
             cekData(user["id"]).then((value) {
-              print(currentStep);
               setState(() {
                 _currentIndex = index;
                 masuk;
