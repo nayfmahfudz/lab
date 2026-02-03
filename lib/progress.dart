@@ -7,7 +7,6 @@ import 'package:Absen_BBWS/setting.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timelines/timelines.dart';
 
@@ -19,7 +18,6 @@ class ProgressLapanngan extends StatefulWidget {
 }
 
 class _ProgressLapannganState extends State<ProgressLapanngan> {
-  @override
   // ignore: override_on_non_overriding_member
   // Tambahkan deklarasi TextEditingController di sini
   final TextEditingController angkatSedimenController = TextEditingController();
@@ -39,9 +37,7 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
   final TextEditingController WK = TextEditingController();
   final TextEditingController debit = TextEditingController();
 
-  @override
   List listProgress = [0, 1, 50, 100];
-  @override
   void _nextStep() {
     try {
       final Map<String, dynamic> data = {};
@@ -66,11 +62,11 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       addIfNotEmpty("pelumasan_pintu_air", pelumasanPintuController.text);
       addIfNotEmpty("wilayah_kerja", WK.text);
 
-      if (valueDI != null && valueDI.toString().trim().isNotEmpty) {
+      if (valueDI.toString().trim().isNotEmpty) {
         data["DI"] = valueDI;
       }
 
-      if (valueKota != null && valueKota.trim().isNotEmpty) {
+      if (valueKota.trim().isNotEmpty) {
         final found = jawaTimur
             .where((item) => item['id'].toString() == valueKota)
             .toList();
@@ -79,7 +75,7 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
         }
       }
 
-      if (valueKecamatan != null && valueKecamatan.trim().isNotEmpty) {
+      if (valueKecamatan.trim().isNotEmpty) {
         final found = kecamatan
             .where((item) => item['id'].toString() == valueKecamatan)
             .toList();
@@ -88,7 +84,7 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
         }
       }
 
-      if (valueKelurahan != null && valueKelurahan.trim().isNotEmpty) {
+      if (valueKelurahan.trim().isNotEmpty) {
         final found = kelurahan
             .where((item) => item['id'].toString() == valueKelurahan)
             .toList();

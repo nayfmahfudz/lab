@@ -16,7 +16,6 @@ class Jam extends StatefulWidget {
 }
 
 class _JamState extends State<Jam> {
-  @override
   String outputnip = "";
   TextEditingController nipText = TextEditingController();
   late DateTime now;

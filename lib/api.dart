@@ -88,7 +88,7 @@ Future daerah(BuildContext context, String daerah, int kode) async {
         options: Options(
             headers: {"Content-Type": "application/json;charset=UTF-8"}));
     return response.data;
-  } on DioError catch (e) {
+  } on DioError {
     // if (e.response?.statusCode != 200) {
     //   return false;
     // }
@@ -101,7 +101,7 @@ Future unit(BuildContext context) async {
         options: Options(
             headers: {"Content-Type": "application/json;charset=UTF-8"}));
     return response.data;
-  } on DioError catch (e) {
+  } on DioError {
     // if (e.response?.statusCode != 200) {
     //   return false;
     // }
