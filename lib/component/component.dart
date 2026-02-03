@@ -229,9 +229,6 @@ String? validatePassword(String? value) {
   if (value == null || value.isEmpty) {
     return 'Field ini wajib diisi';
   }
-  if (value.length < 5) {
-    return 'Minimal 5 karakter';
-  }
   return null; // valid
 }
 
