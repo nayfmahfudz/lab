@@ -54,10 +54,11 @@ Future daftar(BuildContext context, Map user) async {
           "Content-Type": "multipart/form-data",
           "Accept": "application/json",
         }));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return response.data;
     }
   } on DioError catch (e) {
+    print(e.response?.data);
     return e.response?.data;
   }
 }
@@ -133,15 +134,27 @@ Future absenmasuk(BuildContext context, Map user) async {
   }
 }
 
-Future progressFetch(BuildContext context, Map data) async {
+Future progressFetch(BuildContext context, Map data, {String? id}) async {
   try {
     FormData formData = FormData.fromMap(data.cast<String, dynamic>());
-    var response = await Dio().post('$url/progress',
-        data: formData,
-        options: Options(headers: {
-          "Content-Type": "multipart/form-data",
-          "Accept": "application/json",
-        }));
+    Response response;
+    print(id);
+    if (id != null && id != "null") {
+      print("@@1");
+      response = await Dio().put('$url/progress/$id',
+          data: formData,
+          options: Options(headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+          }));
+    } else {
+      response = await Dio().post('$url/progress',
+          data: formData,
+          options: Options(headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+          }));
+    }
     if (response.statusCode == 200) {
       return response.data;
     } else {
@@ -184,9 +197,10 @@ Future absenkeluar(BuildContext context, Map user) async {
   }
 }
 
-Future progress(BuildContext context, int currentPorgress, Map data) async {
+Future progress(BuildContext context, int currentPorgress, Map data,
+    {String? id}) async {
   photo = await _picker.pickImage(source: ImageSource.camera);
-  print(data);
+
   if (photo != null) {
     // Gabungkan data tambahan ke dalam Map data
     Map<String, dynamic> requestData = Map<String, dynamic>.from(data);
@@ -202,7 +216,7 @@ Future progress(BuildContext context, int currentPorgress, Map data) async {
     }
     requestData["idUser"] = user["id"];
 
-    return progressFetch(context, requestData).then((onValue) {
+    return progressFetch(context, requestData, id: id).then((onValue) {
       return onValue;
     });
   }
@@ -328,11 +342,7 @@ Future cekData(idUser) async {
       }
       if (onValue.data["data"]["progress"] != null &&
           onValue.data["data"]["progress"] != "null") {
-        currentStep = int.parse(onValue.data["data"]["progress"].toString());
-      }
-      if (onValue.data["data"]["progress"] == null ||
-          onValue.data["data"]["progress"] == "null") {
-        currentStep = 0;
+        ruas = onValue.data["data"]["progress"];
       }
     }
   }).catchError((e) {});

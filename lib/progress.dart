@@ -6,19 +6,19 @@ import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timelines/timelines.dart';
 
 class ProgressLapanngan extends StatefulWidget {
-  const ProgressLapanngan({super.key});
+  final Map? data;
+  const ProgressLapanngan({super.key, this.data});
 
   @override
   State<ProgressLapanngan> createState() => _ProgressLapannganState();
 }
 
 class _ProgressLapannganState extends State<ProgressLapanngan> {
-  // ignore: override_on_non_overriding_member
+  int currentStep = 0;
   // Tambahkan deklarasi TextEditingController di sini
   final TextEditingController angkatSedimenController = TextEditingController();
   final TextEditingController menutupBocoranController =
@@ -33,15 +33,52 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       TextEditingController();
   final TextEditingController pelumasanPintuController =
       TextEditingController();
+  final TextEditingController babatRumputController = TextEditingController();
+  final TextEditingController kegiatanLainController = TextEditingController();
   final TextEditingController TMA = TextEditingController();
   final TextEditingController WK = TextEditingController();
   final TextEditingController debit = TextEditingController();
+
+  @override
+  void initState() {
+    if (widget.data != null) {
+      currentStep = [
+        widget.data?["progress_1"],
+        widget.data?["progress_50"],
+        widget.data?["progress_100"]
+      ].where((element) => element != null).toList().length;
+      TMA.text = widget.data?["TMA"].toString() ?? "";
+      WK.text = widget.data?["wilayah_kerja"].toString() ?? "";
+      debit.text = widget.data?["debit"].toString() ?? "";
+      angkatSedimenController.text =
+          widget.data?["angkat_sedimen"].toString() ?? "";
+      menutupBocoranController.text =
+          widget.data?["menutup_bocoran"].toString() ?? "";
+      panjangSaluranController.text =
+          widget.data?["panjang_saluran"].toString() ?? "";
+      luasAreaController.text =
+          widget.data?["luas_area_kegiatan"].toString() ?? "";
+      potongPohonController.text =
+          widget.data?["angkat_potong_pohon"].toString() ?? "";
+      pengecatanPintuController.text =
+          widget.data?["pengecatan_pintu_air"].toString() ?? "";
+      pembersihanSampahController.text =
+          widget.data?["pembersihan_sampah"].toString() ?? "";
+      pelumasanPintuController.text =
+          widget.data?["pelumasan_pintu_air"].toString() ?? "";
+      babatRumputController.text =
+          widget.data?["babat_rumput"].toString() ?? "";
+      kegiatanLainController.text =
+          widget.data?["kegiatan_lain"].toString() ?? "";
+    }
+    super.initState();
+  }
 
   List listProgress = [0, 1, 50, 100];
   void _nextStep() {
     try {
       final Map<String, dynamic> data = {};
-
+      var id;
       void addIfNotEmpty(String key, String? value) {
         if (value != null && value.trim().isNotEmpty) {
           data[key] = value.trim();
@@ -60,6 +97,8 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       addIfNotEmpty("pengecatan_pintu_air", pengecatanPintuController.text);
       addIfNotEmpty("pembersihan_sampah", pembersihanSampahController.text);
       addIfNotEmpty("pelumasan_pintu_air", pelumasanPintuController.text);
+      addIfNotEmpty("babat_rumput", babatRumputController.text);
+      addIfNotEmpty("kegiatan_lain", kegiatanLainController.text);
       addIfNotEmpty("wilayah_kerja", WK.text);
 
       if (valueDI.toString().trim().isNotEmpty) {
@@ -92,20 +131,23 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
           data["kelurahan"] = found.first['nama'];
         }
       }
-
-      progress(context, currentStep, data).then((onValue) => {
-            if (onValue["status"] == "Success")
-              {
-                setState(() {
-                  if (currentStep < listProgress.length) {
-                    currentStep++;
+      if (widget.data != null) {
+        id = widget.data?["id"];
+      }
+      progress(context, currentStep, data, id: id.toString())
+          .then((onValue) => {
+                if (onValue["status"] == "Success")
+                  {
+                    setState(() {
+                      if (currentStep < listProgress.length) {
+                        currentStep++;
+                      }
+                    }),
+                    showSuccessPopup(context, onValue["message"]),
                   }
-                }),
-                showSuccessPopup(context, onValue["message"]),
-              }
-            else
-              {showFailPopup(context, onValue["message"])}
-          });
+                else
+                  {showFailPopup(context, onValue["message"])}
+              });
     } catch (e) {
       print(e);
       showFailPopup(context, "Pastikan semua data terisi!");
@@ -114,133 +156,135 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const ScrollPhysics(),
-      child: Container(
-        color: biru,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 100),
-            const Text(
-              'Progress Lapangan',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 100),
-            Container(
-              height: lebar(context) * 0.3,
-              width: lebar(context) * 0.3,
-              padding: const EdgeInsets.all(15.0),
-              child: PieChart(PieChartData(
-                  startDegreeOffset: 70,
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 60, // Inilah yang bikin dia jadi "donut"
-                  sections: [
-                    PieChartSectionData(
-                      color: kuning,
-                      value: (100 - listProgress[currentStep]).toDouble(),
-                      title: '',
-                      radius: 60,
-                      titleStyle:
-                          const TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                    PieChartSectionData(
-                      color: Colors.red,
-                      value: listProgress[currentStep].toDouble(),
-                      title: '${listProgress[currentStep]}%',
-                      radius: 70,
-                      titleStyle:
-                          const TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  ])),
-            ),
-            const SizedBox(height: 50),
-            Center(
-              child: Container(
-                  height: tinggi(context) * 0.2,
-                  width: lebar(context),
-                  padding: const EdgeInsets.all(15.0),
-                  child: Timeline.tileBuilder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    builder: TimelineTileBuilder.connected(
-                      connectionDirection: ConnectionDirection.before,
-                      itemCount: 3,
-                      contentsBuilder: (_, index) => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: index < currentStep
-                                  ? Colors.red
-                                  : Colors.red.shade100,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(10))),
-                          width: lebar(context) * 0.26,
-                          height: tinggi(context) * 0.2,
-                          child: Center(
-                            child: Text(
-                              index < currentStep
-                                  ? 'Terkirim'
-                                  : 'Belum Terkirim',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+    return Scaffold(
+      body: SingleChildScrollView(
+        physics: const ScrollPhysics(),
+        child: Container(
+          color: biru,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 100),
+              const Text(
+                'Progress Lapangan',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 100),
+              Container(
+                height: lebar(context) * 0.3,
+                width: lebar(context) * 0.3,
+                padding: const EdgeInsets.all(15.0),
+                child: PieChart(PieChartData(
+                    startDegreeOffset: 70,
+                    sectionsSpace: 2,
+                    centerSpaceRadius: 60, // Inilah yang bikin dia jadi "donut"
+                    sections: [
+                      PieChartSectionData(
+                        color: kuning,
+                        value: (100 - listProgress[currentStep]).toDouble(),
+                        title: '',
+                        radius: 60,
+                        titleStyle:
+                            const TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                      PieChartSectionData(
+                        color: Colors.red,
+                        value: listProgress[currentStep].toDouble(),
+                        title: '${listProgress[currentStep]}%',
+                        radius: 70,
+                        titleStyle:
+                            const TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ])),
+              ),
+              const SizedBox(height: 50),
+              Center(
+                child: Container(
+                    height: tinggi(context) * 0.2,
+                    width: lebar(context),
+                    padding: const EdgeInsets.all(15.0),
+                    child: Timeline.tileBuilder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      builder: TimelineTileBuilder.connected(
+                        connectionDirection: ConnectionDirection.before,
+                        itemCount: 3,
+                        contentsBuilder: (_, index) => Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: index < currentStep
+                                    ? Colors.red
+                                    : Colors.red.shade100,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(10))),
+                            width: lebar(context) * 0.26,
+                            height: tinggi(context) * 0.2,
+                            child: Center(
+                              child: Text(
+                                index < currentStep
+                                    ? 'Terkirim'
+                                    : 'Belum Terkirim',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
+                        indicatorBuilder: (_, index) {
+                          if (index < currentStep) {
+                            return const DotIndicator(
+                              color: Colors.red,
+                              child: Icon(Icons.check,
+                                  color: Colors.white, size: 12),
+                            );
+                          } else if (index == currentStep) {
+                            return const DotIndicator(
+                              color: Colors.redAccent,
+                              child: Icon(Icons.circle,
+                                  color: Colors.white, size: 12),
+                            );
+                          } else {
+                            return OutlinedDotIndicator(
+                              borderWidth: 2,
+                              color: Colors.red.shade200,
+                            );
+                          }
+                        },
+                        connectorBuilder: (_, index, __) {
+                          return SolidLineConnector(
+                            color: index < currentStep
+                                ? Colors.red
+                                : Colors.red.shade100,
+                          );
+                        },
                       ),
-                      indicatorBuilder: (_, index) {
-                        if (index < currentStep) {
-                          return const DotIndicator(
-                            color: Colors.red,
-                            child: Icon(Icons.check,
-                                color: Colors.white, size: 12),
-                          );
-                        } else if (index == currentStep) {
-                          return const DotIndicator(
-                            color: Colors.redAccent,
-                            child: Icon(Icons.circle,
-                                color: Colors.white, size: 12),
-                          );
-                        } else {
-                          return OutlinedDotIndicator(
-                            borderWidth: 2,
-                            color: Colors.red.shade200,
-                          );
-                        }
-                      },
-                      connectorBuilder: (_, index, __) {
-                        return SolidLineConnector(
-                          color: index < currentStep
-                              ? Colors.red
-                              : Colors.red.shade100,
-                        );
-                      },
-                    ),
-                  )),
-            ),
-            const SizedBox(height: 50),
-            formProgress(context),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  currentStep == listProgress.length - 1 ? null : _nextStep();
-                });
-              },
-              child: Container(
-                height: tinggi(context) * 0.05,
-                width: lebar(context) * 0.4,
-                child: loginButton("Laporkan Progress", kuning, Colors.black),
+                    )),
               ),
-            ),
-            SizedBox(
-              height: tinggi(context) * 0.16,
-            ),
-          ],
+              const SizedBox(height: 50),
+              formProgress(context),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    currentStep == listProgress.length - 1 ? null : _nextStep();
+                  });
+                },
+                child: Container(
+                  height: tinggi(context) * 0.05,
+                  width: lebar(context) * 0.4,
+                  child: loginButton("Laporkan Progress", kuning, Colors.black),
+                ),
+              ),
+              SizedBox(
+                height: tinggi(context) * 0.16,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -301,10 +345,14 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
                 pengecatanPintuController, "Pengecatan Pintu", "bh", context),
             SizedBox(height: lebar(context) * 0.05),
             progressForm(pembersihanSampahController, "Pembersihan Sampah",
-                "kg", context),
+                "m3", context),
             SizedBox(height: lebar(context) * 0.05),
             progressForm(
                 pelumasanPintuController, "Pelumasan Pintu", "bh", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(babatRumputController, "Babat Rumput", "m3", context),
+            SizedBox(height: lebar(context) * 0.05),
+            progressForm(kegiatanLainController, "Kegiatan Lain", "", context),
             SizedBox(height: lebar(context) * 0.12),
           ],
         ),

@@ -171,9 +171,7 @@ class DaftarState extends State<Daftar> {
                           16.height,
                           buildTextField('NIK', NIK),
                           16.height,
-                          buildTextField('First Name', firstNameCont),
-                          16.height,
-                          buildTextField('Last Name', lastNameCont),
+                          buildTextField('Nama Lengkap', firstNameCont),
                           16.height,
                           buildTextField('Email', emailCont,
                               inputType: TextInputType.emailAddress,
@@ -209,7 +207,15 @@ class DaftarState extends State<Daftar> {
                           petugaslapangan == "1" ? 16.height : Container(),
                           petugaslapangan == "1"
                               ? dropdownFieldphs(
-                                  ["PPA", "Pekarya", "PPA POB", "Pekarya POB"],
+                                  [
+                                    "PPA",
+                                    "Pekarya",
+                                    "PPA POB",
+                                    "Pekarya POB",
+                                    "Pengamat",
+                                    "Juru",
+                                    "Staff Pengamat"
+                                  ],
                                   onChanged: (newValue) {
                                     setState(() {
                                       jabatan = newValue.toString();
@@ -314,8 +320,7 @@ class DaftarState extends State<Daftar> {
     List<String> missing = [];
 
     if (NIK.text.trim().isEmpty) missing.add("NIK");
-    if (firstNameCont.text.trim().isEmpty) missing.add("First Name");
-    if (lastNameCont.text.trim().isEmpty) missing.add("Last Name");
+    if (firstNameCont.text.trim().isEmpty) missing.add("Nama Lengkap");
     if (emailCont.text.trim().isEmpty) missing.add("Email");
     if (passwordCont.text.trim().isEmpty) missing.add("Password");
     if (sekolahCont.text.trim().isEmpty)

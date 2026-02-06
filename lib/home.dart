@@ -2,6 +2,7 @@ import 'package:Absen_BBWS/api.dart';
 import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/jam.dart';
+import 'package:Absen_BBWS/option.dart';
 import 'package:Absen_BBWS/profile.dart';
 import 'package:Absen_BBWS/progress.dart';
 import 'package:Absen_BBWS/setting.dart';
@@ -29,7 +30,7 @@ class _HomeState extends State<Home> {
     } else {
       return <Widget>[
         Jam(),
-        ProgressLapanngan(),
+        Option(),
         ProfileScreen(),
       ];
     }
@@ -71,7 +72,6 @@ class _HomeState extends State<Home> {
       setState(() {
         masuk;
         keluar;
-        currentStep;
       });
     });
     loadJson();
@@ -89,6 +89,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        color: biru,
         child: SizedBox.expand(
           child: PageView(
             controller: _pageController,
@@ -120,7 +121,6 @@ class _HomeState extends State<Home> {
                 _currentIndex = index;
                 masuk;
                 keluar;
-                currentStep;
               });
             });
             _pageController.jumpToPage(index);
