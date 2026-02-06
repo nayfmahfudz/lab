@@ -1,3 +1,4 @@
+import 'package:Absen_BBWS/api.dart';
 import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/setting.dart';
@@ -23,6 +24,11 @@ class _OptionState extends State<Option> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    setState(() {
+      _cards.clear();
+      ruas;
+    });
+
     width = lebar(context) * 0.8;
     height = tinggi(context) * 0.07;
     if (_cards.isEmpty) {

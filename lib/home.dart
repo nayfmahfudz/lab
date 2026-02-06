@@ -72,6 +72,7 @@ class _HomeState extends State<Home> {
       setState(() {
         masuk;
         keluar;
+        ruas;
       });
     });
     loadJson();
@@ -121,6 +122,7 @@ class _HomeState extends State<Home> {
                 _currentIndex = index;
                 masuk;
                 keluar;
+                ruas;
               });
             });
             _pageController.jumpToPage(index);

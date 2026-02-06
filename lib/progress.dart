@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:Absen_BBWS/api.dart';
 import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/fom.dart';
+import 'package:Absen_BBWS/home.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -156,134 +157,166 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        physics: const ScrollPhysics(),
-        child: Container(
-          color: biru,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 100),
-              const Text(
-                'Progress Lapangan',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 100),
-              Container(
-                height: lebar(context) * 0.3,
-                width: lebar(context) * 0.3,
-                padding: const EdgeInsets.all(15.0),
-                child: PieChart(PieChartData(
-                    startDegreeOffset: 70,
-                    sectionsSpace: 2,
-                    centerSpaceRadius: 60, // Inilah yang bikin dia jadi "donut"
-                    sections: [
-                      PieChartSectionData(
-                        color: kuning,
-                        value: (100 - listProgress[currentStep]).toDouble(),
-                        title: '',
-                        radius: 60,
-                        titleStyle:
-                            const TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                      PieChartSectionData(
-                        color: Colors.red,
-                        value: listProgress[currentStep].toDouble(),
-                        title: '${listProgress[currentStep]}%',
-                        radius: 70,
-                        titleStyle:
-                            const TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    ])),
-              ),
-              const SizedBox(height: 50),
-              Center(
-                child: Container(
-                    height: tinggi(context) * 0.2,
-                    width: lebar(context),
-                    padding: const EdgeInsets.all(15.0),
-                    child: Timeline.tileBuilder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      builder: TimelineTileBuilder.connected(
-                        connectionDirection: ConnectionDirection.before,
-                        itemCount: 3,
-                        contentsBuilder: (_, index) => Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: index < currentStep
-                                    ? Colors.red
-                                    : Colors.red.shade100,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(10))),
-                            width: lebar(context) * 0.26,
-                            height: tinggi(context) * 0.2,
-                            child: Center(
-                              child: Text(
-                                index < currentStep
-                                    ? 'Terkirim'
-                                    : 'Belum Terkirim',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+    return PopScope(
+      canPop: false, // true = boleh back, false = ditahan
+      onPopInvoked: (didPop) {
+        navigateToNextScreen(context, Home());
+      },
+      child: Scaffold(
+        body: SingleChildScrollView(
+          physics: const ScrollPhysics(),
+          child: Container(
+            color: biru,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 100),
+                const Text(
+                  'Progress Lapangan',
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 100),
+                Container(
+                  height: lebar(context) * 0.3,
+                  width: lebar(context) * 0.3,
+                  padding: const EdgeInsets.all(15.0),
+                  child: PieChart(PieChartData(
+                      startDegreeOffset: 70,
+                      sectionsSpace: 2,
+                      centerSpaceRadius:
+                          60, // Inilah yang bikin dia jadi "donut"
+                      sections: [
+                        PieChartSectionData(
+                          color: kuning,
+                          value: (100 - listProgress[currentStep]).toDouble(),
+                          title: '',
+                          radius: 60,
+                          titleStyle: const TextStyle(
+                              color: Colors.white, fontSize: 14),
+                        ),
+                        PieChartSectionData(
+                          color: Colors.red,
+                          value: listProgress[currentStep].toDouble(),
+                          title: '${listProgress[currentStep]}%',
+                          radius: 70,
+                          titleStyle: const TextStyle(
+                              color: Colors.white, fontSize: 14),
+                        ),
+                      ])),
+                ),
+                const SizedBox(height: 50),
+                Center(
+                  child: Container(
+                      height: tinggi(context) * 0.2,
+                      width: lebar(context),
+                      padding: const EdgeInsets.all(15.0),
+                      child: Timeline.tileBuilder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        builder: TimelineTileBuilder.connected(
+                          connectionDirection: ConnectionDirection.before,
+                          itemCount: 3,
+                          contentsBuilder: (_, index) => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: index < currentStep
+                                      ? Colors.red
+                                      : Colors.red.shade100,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              width: lebar(context) * 0.26,
+                              height: tinggi(context) * 0.2,
+                              child: Center(
+                                child: Text(
+                                  index < currentStep
+                                      ? 'Terkirim'
+                                      : 'Belum Terkirim',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
+                          indicatorBuilder: (_, index) {
+                            if (index < currentStep) {
+                              return const DotIndicator(
+                                color: Colors.red,
+                                child: Icon(Icons.check,
+                                    color: Colors.white, size: 12),
+                              );
+                            } else if (index == currentStep) {
+                              return const DotIndicator(
+                                color: Colors.redAccent,
+                                child: Icon(Icons.circle,
+                                    color: Colors.white, size: 12),
+                              );
+                            } else {
+                              return OutlinedDotIndicator(
+                                borderWidth: 2,
+                                color: Colors.red.shade200,
+                              );
+                            }
+                          },
+                          connectorBuilder: (_, index, __) {
+                            return SolidLineConnector(
+                              color: index < currentStep
+                                  ? Colors.red
+                                  : Colors.red.shade100,
+                            );
+                          },
                         ),
-                        indicatorBuilder: (_, index) {
-                          if (index < currentStep) {
-                            return const DotIndicator(
-                              color: Colors.red,
-                              child: Icon(Icons.check,
-                                  color: Colors.white, size: 12),
-                            );
-                          } else if (index == currentStep) {
-                            return const DotIndicator(
-                              color: Colors.redAccent,
-                              child: Icon(Icons.circle,
-                                  color: Colors.white, size: 12),
-                            );
-                          } else {
-                            return OutlinedDotIndicator(
-                              borderWidth: 2,
-                              color: Colors.red.shade200,
-                            );
-                          }
-                        },
-                        connectorBuilder: (_, index, __) {
-                          return SolidLineConnector(
-                            color: index < currentStep
-                                ? Colors.red
-                                : Colors.red.shade100,
-                          );
-                        },
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 50),
-              formProgress(context),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    currentStep == listProgress.length - 1 ? null : _nextStep();
-                  });
-                },
-                child: Container(
-                  height: tinggi(context) * 0.05,
-                  width: lebar(context) * 0.4,
-                  child: loginButton("Laporkan Progress", kuning, Colors.black),
+                      )),
                 ),
-              ),
-              SizedBox(
-                height: tinggi(context) * 0.16,
-              ),
-            ],
+                const SizedBox(height: 50),
+                formProgress(context),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18.0, 8, 18.0, 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            currentStep == 0 ? null : currentStep--;
+                          });
+                        },
+                        child: Container(
+                          height: tinggi(context) * 0.05,
+                          width: lebar(context) * 0.4,
+                          child: loginButton(
+                              "Ulangi Progress", merah, Colors.black),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            currentStep == listProgress.length - 1
+                                ? null
+                                : _nextStep();
+                          });
+                        },
+                        child: Container(
+                          height: tinggi(context) * 0.05,
+                          width: lebar(context) * 0.4,
+                          child: loginButton(
+                              "Laporkan Progress", kuning, Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: tinggi(context) * 0.16,
+                ),
+              ],
+            ),
           ),
         ),
       ),
