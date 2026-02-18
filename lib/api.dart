@@ -110,6 +110,19 @@ Future unit(BuildContext context) async {
   }
 }
 
+Future tenaga_op(BuildContext context) async {
+  try {
+    var response = await Dio().get('$url/users/tenaga_op',
+        options: Options(
+            headers: {"Content-Type": "application/json;charset=UTF-8"}));
+    return response.data;
+  } on DioError {
+    // if (e.response?.statusCode != 200) {
+    //   return false;
+    // }
+  }
+}
+
 Future absenmasuk(BuildContext context, Map user) async {
   try {
     FormData formData = FormData.fromMap(user.cast<String, dynamic>());

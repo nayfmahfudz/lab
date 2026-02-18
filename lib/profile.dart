@@ -135,7 +135,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Text('Masuk', style: secondaryTextStyle()),
                         4.height,
-                        Text('20', style: boldTextStyle(size: 16)),
+                        Text('0', style: boldTextStyle(size: 16)),
                       ],
                     ),
                     Column(
@@ -143,7 +143,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Text('Absen', style: secondaryTextStyle()),
                         4.height,
-                        Text('1', style: boldTextStyle(size: 16)),
+                        Text('0', style: boldTextStyle(size: 16)),
                       ],
                     ),
                     Column(
@@ -151,7 +151,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Text('Izin', style: secondaryTextStyle()),
                         4.height,
-                        Text('2', style: boldTextStyle(size: 16)),
+                        Text('0', style: boldTextStyle(size: 16)),
                       ],
                     ),
                   ],

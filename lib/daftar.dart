@@ -38,6 +38,7 @@ class DaftarState extends State<Daftar> {
   var petugaslapangan = "";
   var jabatan = "";
   List Listunit = [];
+  List petugasOP = [];
   File? _image;
   File? _KTP;
 
@@ -51,6 +52,15 @@ class DaftarState extends State<Daftar> {
 
   @override
   void initState() {
+    tenaga_op(context).then((value) {
+      setState(() {
+        petugasOP = value;
+        petugasCont.text = value[0]["id"].toString();
+      });
+    }).catchError((e) {
+      print(e);
+      toast("Gagal mengambil data petugas");
+    });
     unit(context).then((value) {
       setState(() {
         Listunit = value;
@@ -62,31 +72,6 @@ class DaftarState extends State<Daftar> {
     });
     super.initState();
   }
-
-  // pilihan(value) {
-  //   return [
-  //     ListTile(
-  //         leading: new Icon(Icons.camera),
-  //         title: new Text('Camera'),
-  //         onTap: () => pickImageFromCamera(getImage(value)).then(
-  //               (value) {
-  //                 setState(() {
-  //                   _image = value;
-  //                 });
-  //               },
-  //             )),
-  //     ListTile(
-  //       leading: new Icon(Icons.image),
-  //       title: new Text('Gallery'),
-  //       onTap: () => pickImageFromGallery(getImage(value)).then((value) {
-  //         setState(() {
-  //           index;
-  //           _KTP = value;
-  //         });
-  //       }),
-  //     ),
-  //   ];
-  // }
 
   int index = 0;
   @override
@@ -206,19 +191,11 @@ class DaftarState extends State<Daftar> {
                           ),
                           petugaslapangan == "1" ? 16.height : Container(),
                           petugaslapangan == "1"
-                              ? dropdownFieldphs(
-                                  [
-                                    "PPA",
-                                    "Pekarya",
-                                    "PPA POB",
-                                    "Pekarya POB",
-                                    "Pengamat",
-                                    "Juru",
-                                    "Staff Pengamat"
-                                  ],
+                              ? dropdownFieldop(
+                                  petugasOP,
                                   onChanged: (newValue) {
                                     setState(() {
-                                      jabatan = newValue.toString();
+                                      jabatan = newValue["id"].toString();
                                     });
                                   },
                                 )

@@ -251,7 +251,7 @@ Widget dropdownFieldphs(
   List list, {
   bool isPassword = false,
   TextInputType inputType = TextInputType.text,
-  Function(dynamic?)? onChanged,
+  Function(dynamic)? onChanged,
 }) {
   return Container(
     width: double.infinity,
@@ -267,6 +267,35 @@ Widget dropdownFieldphs(
         return DropdownMenuItem(
           value: value,
           child: Text(value, style: const TextStyle(color: hitam)),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      hint: const Text('Select an option'),
+    ),
+  );
+}
+
+Widget dropdownFieldop(
+  List list, {
+  bool isPassword = false,
+  TextInputType inputType = TextInputType.text,
+  Function(dynamic)? onChanged,
+}) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    decoration: BoxDecoration(
+      border: Border.all(color: hitam),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: DropdownButtonFormField(
+      validator: (value) => value == null ? 'Harap pilih salah satu' : null,
+      isExpanded: true,
+      items: list.map((value) {
+        return DropdownMenuItem(
+          value: value,
+          child:
+              Text(value["nama_tenaga"], style: const TextStyle(color: hitam)),
         );
       }).toList(),
       onChanged: onChanged,

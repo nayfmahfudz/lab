@@ -157,7 +157,8 @@ class _TmaScreenState extends State<TmaScreen> {
                 ),
                 SizedBox(height: lebar(context) * 0.05),
                 progressForm(
-                    nomenklaturController, "Nama Bangunan", "", context),
+                    nomenklaturController, "Nama Bangunan", "", context,
+                    enabled: false),
                 SizedBox(height: lebar(context) * 0.05),
                 progressForm(latitude, "Latitude", "", context),
                 SizedBox(height: lebar(context) * 0.05),
