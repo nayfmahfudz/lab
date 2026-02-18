@@ -164,18 +164,25 @@ Widget userLogin(TextEditingController namaController) {
   );
 }
 
-Widget passwordLogin(TextEditingController passwordController) {
+Widget passwordLogin(TextEditingController passwordController,
+    {bool obscureText = true, VoidCallback? suffixIcononChanged}) {
   return Container(
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
     child: TextFormField(
       controller: passwordController,
-      obscureText: true,
+      obscureText: obscureText,
       validator: (input) {
         return validatePassword(input);
       },
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+          suffixIcon: IconButton(
+            icon: Icon(
+              obscureText ? Icons.visibility_off : Icons.visibility,
+            ),
+            onPressed: suffixIcononChanged,
+          ),
           hintText: "Password",
           hintStyle: TextStyle(color: Colors.grey),
           border: InputBorder.none),
@@ -244,7 +251,7 @@ Widget dropdownFieldphs(
   List list, {
   bool isPassword = false,
   TextInputType inputType = TextInputType.text,
-  Function(Object?)? onChanged,
+  Function(dynamic?)? onChanged,
 }) {
   return Container(
     width: double.infinity,

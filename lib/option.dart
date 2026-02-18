@@ -1,9 +1,11 @@
 import 'package:Absen_BBWS/api.dart';
 import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/fom.dart';
+import 'package:Absen_BBWS/historyTMA.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:flutter/material.dart';
 import 'progress.dart';
+import 'tma.dart';
 
 class Option extends StatefulWidget {
   const Option({super.key});
@@ -44,12 +46,16 @@ class _OptionState extends State<Option> {
 
   void _addCard([Map? data]) {
     setState(() {
-      if (_cards.length < (ruas.length + 1)) {
+      if (_cards.length < (1)) {
         _cards.add(_buildCard(_cards.length + 1, data));
       } else {
         showFailPopup(context, "Isi terlebih dahulu kegiatan yang ada");
       }
     });
+  }
+
+  void _historyCard([Map? data]) {
+    navigateToNextScreen(context, HistortTMAScreen());
   }
 
   Widget _buildCard(int cardNumber, [Map? data]) {
@@ -101,12 +107,24 @@ class _OptionState extends State<Option> {
             ..._cards,
             const SizedBox(height: 20),
             GestureDetector(
-                onTap: _addCard,
+                onTap: _historyCard,
                 child: Container(
                     height: 50,
                     width: lebar(context) * 0.6,
-                    child:
-                        loginButton("Tambah Kegiatan", kuning, Colors.black))),
+                    child: loginButton("Riwayat TMA", kuning, Colors.black))),
+            const SizedBox(height: 20),
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const TmaScreen()));
+                },
+                child: Container(
+                    height: 50,
+                    width: lebar(context) * 0.6,
+                    child: loginButton(
+                        "Lapor TMA", Colors.red[400]!, Colors.black))),
             SizedBox(height: tinggi(context) * 0.16),
           ],
         ),

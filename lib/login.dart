@@ -25,7 +25,6 @@ class LoginState extends State<Login> {
   var passwordController = TextEditingController();
   var hide = true;
   var error = "";
-  var sales = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +101,13 @@ class LoginState extends State<Login> {
                                     child: Column(
                                       children: <Widget>[
                                         userLogin(namaController),
-                                        passwordLogin(passwordController)
+                                        passwordLogin(passwordController,
+                                            obscureText: hide,
+                                            suffixIcononChanged: () {
+                                          setState(() {
+                                            hide = !hide;
+                                          });
+                                        }),
                                       ],
                                     ),
                                   )),

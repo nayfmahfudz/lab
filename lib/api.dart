@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:Absen_BBWS/component/component.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:flutter/services.dart';
@@ -134,11 +135,47 @@ Future absenmasuk(BuildContext context, Map user) async {
   }
 }
 
+Future tmaFetch(BuildContext context, Map data, {String? id}) async {
+  try {
+    FormData formData = FormData.fromMap(data.cast<String, dynamic>());
+    Response response;
+    if (id != null && id != "null") {
+      response = await Dio().put('$url/tma/$id',
+          data: formData,
+          options: Options(headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+          }));
+    } else {
+      response = await Dio().post('$url/tma',
+          data: formData,
+          options: Options(headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+          }));
+    }
+    print(response.data);
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      throw Exception("Failed to submit absenmasuk: ${response.statusMessage}");
+    }
+  } on DioError catch (e) {
+    if (e.response != null) {
+      return e.message;
+    } else {
+      return e.message;
+    }
+  } catch (e) {
+    return e.toString();
+  }
+}
+
 Future progressFetch(BuildContext context, Map data, {String? id}) async {
   try {
     FormData formData = FormData.fromMap(data.cast<String, dynamic>());
     Response response;
-    print(id);
+    print("@@0");
     if (id != null && id != "null") {
       print("@@1");
       response = await Dio().put('$url/progress/$id',
@@ -154,6 +191,7 @@ Future progressFetch(BuildContext context, Map data, {String? id}) async {
             "Content-Type": "multipart/form-data",
             "Accept": "application/json",
           }));
+      print(response.data);
     }
     if (response.statusCode == 200) {
       return response.data;
@@ -162,12 +200,63 @@ Future progressFetch(BuildContext context, Map data, {String? id}) async {
     }
   } on DioError catch (e) {
     if (e.response != null) {
-      return e.response?.data;
-    } else {
-      return {"error": e.message};
+      return {
+        "message": e.response?.statusMessage ?? "DioError without response"
+      };
     }
   } catch (e) {
-    return {"error": "Unexpected error occurred"};
+    return e.toString();
+  }
+}
+
+Future getHistory() async {
+  try {
+    // Mengambil data history TMA berdasarkan user id
+    var response = await Dio().get('$url/tma',
+        queryParameters: {
+          "idUser": user["id"].toString(),
+          "tanggal": DateFormat("yyyy-MM-dd").format(DateTime.now()).toString()
+        },
+        options: Options(headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        }));
+    print(response.data);
+    if (response.statusCode == 200 && response.data["status"] == "Success") {
+      return response.data;
+    } else {
+      response.data;
+    }
+  } catch (e) {
+    print("Error fetching history: $e");
+    return {"status": "Fail", "message": e.toString()};
+  }
+}
+
+Future laporTMA(BuildContext context, Map data) async {
+  try {
+    // Persiapkan data untuk Multipart
+    Map<String, dynamic> requestData = Map<String, dynamic>.from(data);
+
+    // Convert File objects to MultipartFile
+    for (var key in requestData.keys.toList()) {
+      if (key.startsWith("foto_TMA") && requestData[key] is File) {
+        File file = requestData[key];
+        requestData[key] = MultipartFile.fromFileSync(file.path,
+            filename: file.path.split('/').last);
+      }
+    }
+
+    requestData["idUser"] = user["id"];
+    requestData["created"] =
+        DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+
+    // Menggunakan endpoint progress atau endpoint khusus TMA jika ada
+    // Disini kita gunakan progressFetch karena strukturnya mirip
+    return tmaFetch(context, requestData);
+  } catch (e) {
+    print("Error laporTMA: $e");
+    return {"status": "Fail", "message": e.toString()};
   }
 }
 
@@ -204,6 +293,13 @@ Future progress(BuildContext context, int currentPorgress, Map data,
   if (photo != null) {
     // Gabungkan data tambahan ke dalam Map data
     Map<String, dynamic> requestData = Map<String, dynamic>.from(data);
+    for (var key in requestData.keys.toList()) {
+      if (key.startsWith("foto_TMA") && requestData[key] is File) {
+        File file = requestData[key];
+        requestData[key] = MultipartFile.fromFileSync(file.path,
+            filename: file.path.split('/').last);
+      }
+    }
     if (currentPorgress == 0) {
       requestData["progress_1"] = MultipartFile.fromFileSync(photo!.path,
           filename: photo?.path.split('/').last);

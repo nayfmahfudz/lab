@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:Absen_BBWS/api.dart';
 import 'package:Absen_BBWS/component/component.dart';
@@ -6,7 +7,9 @@ import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/home.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timelines/timelines.dart';
 
@@ -36,21 +39,23 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       TextEditingController();
   final TextEditingController babatRumputController = TextEditingController();
   final TextEditingController kegiatanLainController = TextEditingController();
-  final TextEditingController TMA = TextEditingController();
   final TextEditingController WK = TextEditingController();
-  final TextEditingController debit = TextEditingController();
+  String KerjaIndividu = "1";
+  List<TmaDebitEntry> tmaEntries = [];
 
   @override
   void initState() {
+    tmaEntries.add(TmaDebitEntry());
     if (widget.data != null) {
       currentStep = [
         widget.data?["progress_1"],
         widget.data?["progress_50"],
         widget.data?["progress_100"]
       ].where((element) => element != null).toList().length;
-      TMA.text = widget.data?["TMA"].toString() ?? "";
+      tmaEntries[0].tmaController.text = widget.data?["TMA"].toString() ?? "";
       WK.text = widget.data?["wilayah_kerja"].toString() ?? "";
-      debit.text = widget.data?["debit"].toString() ?? "";
+      tmaEntries[0].debitController.text =
+          widget.data?["debit"].toString() ?? "";
       angkatSedimenController.text =
           widget.data?["angkat_sedimen"].toString() ?? "";
       menutupBocoranController.text =
@@ -86,10 +91,8 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
         }
       }
 
-      addIfNotEmpty("TMA", TMA.text);
       addIfNotEmpty("longitude", longitude.text);
       addIfNotEmpty("latitude", latitude.text);
-      addIfNotEmpty("debit", debit.text);
       addIfNotEmpty("angkat_sedimen", angkatSedimenController.text);
       addIfNotEmpty("menutup_bocoran", menutupBocoranController.text);
       addIfNotEmpty("panjang_saluran", panjangSaluranController.text);
@@ -101,6 +104,19 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       addIfNotEmpty("babat_rumput", babatRumputController.text);
       addIfNotEmpty("kegiatan_lain", kegiatanLainController.text);
       addIfNotEmpty("wilayah_kerja", WK.text);
+      addIfNotEmpty("kerja_individu", KerjaIndividu);
+      if (KerjaIndividu != "0" && KerjaIndividu != "1") {
+        showFailPopup(context, "Pilih jenis kerja individu atau kelompok!");
+        return;
+      }
+      for (int i = 0; i < tmaEntries.length; i++) {
+        String suffix = "_${i + 1}";
+        addIfNotEmpty("TMA$suffix", tmaEntries[i].tmaController.text);
+        addIfNotEmpty("debit$suffix", tmaEntries[i].debitController.text);
+        if (tmaEntries[i].imageTMA != null) {
+          data["foto_TMA$suffix"] = tmaEntries[i].imageTMA;
+        }
+      }
 
       if (valueDI.toString().trim().isNotEmpty) {
         data["DI"] = valueDI;
@@ -135,8 +151,10 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       if (widget.data != null) {
         id = widget.data?["id"];
       }
+      print(data);
       progress(context, currentStep, data, id: id.toString())
           .then((onValue) => {
+                print(onValue),
                 if (onValue["status"] == "Success")
                   {
                     setState(() {
@@ -147,7 +165,10 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
                     showSuccessPopup(context, onValue["message"]),
                   }
                 else
-                  {showFailPopup(context, onValue["message"])}
+                  {
+                    // print(onValue)
+                    showFailPopup(context, onValue["message"])
+                  }
               });
     } catch (e) {
       print(e);
@@ -275,6 +296,7 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
                 ),
                 const SizedBox(height: 50),
                 formProgress(context),
+                const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18.0, 8, 18.0, 8.0),
                   child: Row(
@@ -343,6 +365,24 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: lebar(context) * 0.06),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(43.0, 8, 43.0, 0),
+              child: dropdownFieldphs(
+                ["Kerja Individu", "Kerja Kelompok"],
+                onChanged: (newValue) {
+                  if (newValue == "Kerja Kelompok") {
+                    setState(() {
+                      KerjaIndividu = "0";
+                    });
+                  } else {
+                    setState(() {
+                      KerjaIndividu = "1";
+                    });
+                  }
+                },
+              ),
+            ),
+            SizedBox(height: lebar(context) * 0.06),
             rowDropdownFormDi(di, valueDI),
             rowDropdownForm(
               jawaTimur,
@@ -357,9 +397,6 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
             SizedBox(height: lebar(context) * 0.05),
             progressForm(longitude, "longitude", "", context),
             SizedBox(height: lebar(context) * 0.05),
-            progressForm(TMA, "Tinggi Muka Air", "cm", context),
-            SizedBox(height: lebar(context) * 0.05),
-            progressForm(debit, "Debit", "m\u00B3", context),
             SizedBox(height: lebar(context) * 0.05),
             progressForm(
                 angkatSedimenController, "Angkat Sedimen", "m\u00B3", context),
@@ -385,13 +422,44 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
             SizedBox(height: lebar(context) * 0.05),
             progressForm(babatRumputController, "Babat Rumput", "m3", context),
             SizedBox(height: lebar(context) * 0.05),
-            progressForm(kegiatanLainController, "Kegiatan Lain", "", context),
+            progressForm(kegiatanLainController, "Kegiatan Lain", "", context,
+                enabled: false),
             SizedBox(height: lebar(context) * 0.12),
           ],
         ),
       ),
     );
   }
+
+  Widget tombolUploadTMA(TmaDebitEntry entry) => GestureDetector(
+        onTap: () {
+          pilihanModal(context, pilihan(
+            (value) {
+              setState(() {
+                entry.imageTMA = value;
+              });
+            },
+          ));
+        },
+        child: Container(
+          decoration: BoxDecoration(
+              color: entry.imageTMA != null ? biru : Colors.red.shade100,
+              borderRadius: const BorderRadius.all(Radius.circular(10))),
+          width: lebar(context) * 0.7,
+          height: tinggi(context) * 0.05,
+          child: Center(
+            child: Text(
+              entry.imageTMA != null ? 'Terupload' : 'Upload Peilschaal',
+              style: const TextStyle(
+                color: hitam,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
 
   Widget containerForm(
       TextEditingController controller1,
@@ -473,4 +541,10 @@ class _ProgressLapannganState extends State<ProgressLapanngan> {
       ),
     );
   }
+}
+
+class TmaDebitEntry {
+  final TextEditingController tmaController = TextEditingController();
+  final TextEditingController debitController = TextEditingController();
+  File? imageTMA;
 }
