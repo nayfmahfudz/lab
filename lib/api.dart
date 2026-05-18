@@ -228,7 +228,9 @@ Future getHistory() async {
     var response = await Dio().get('$url/tma',
         queryParameters: {
           "idUser": user["id"].toString(),
-          "tanggal": DateFormat("yyyy-MM-dd").format(DateTime.now()).toString()
+          "tanggal": DateFormat("yyyy-MM-dd", 'id_ID')
+              .format(DateTime.now())
+              .toString()
         },
         options: Options(headers: {
           "Content-Type": "application/json",
@@ -262,7 +264,7 @@ Future laporTMA(BuildContext context, Map data) async {
 
     requestData["idUser"] = user["id"];
     requestData["created"] =
-        DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+        DateFormat("yyyy-MM-dd HH:mm:ss", 'id_ID').format(DateTime.now());
 
     // Menggunakan endpoint progress atau endpoint khusus TMA jika ada
     // Disini kita gunakan progressFetch karena strukturnya mirip
@@ -346,7 +348,8 @@ Future absen(BuildContext context, String absen) async {
     absenmasuk(context, {
       "latitude": position.latitude.toString(),
       "longtitude": position.longitude.toString(),
-      "created": DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
+      "created":
+          DateFormat("yyyy-MM-dd HH:mm:ss", 'id_ID').format(DateTime.now()),
       "absen": photo != null
           ? MultipartFile.fromFileSync(photo!.path,
               filename: photo?.path.split('/').last)
@@ -355,7 +358,9 @@ Future absen(BuildContext context, String absen) async {
     }).then((onValue) => {
           if (onValue["status"] == "Success")
             {
-              masuk = DateFormat("HH:mm").format(DateTime.now()).toString(),
+              masuk = DateFormat("HH:mm", 'id_ID')
+                  .format(DateTime.now())
+                  .toString(),
               prefs.setString("masuk", masuk),
               showSuccessPopup(context, onValue["message"])
             }
@@ -366,7 +371,8 @@ Future absen(BuildContext context, String absen) async {
     absenkeluar(context, {
       "latitude": position.latitude.toString(),
       "longtitude": position.longitude.toString(),
-      "created": DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now()),
+      "created":
+          DateFormat("yyyy-MM-dd HH:mm:ss", 'id_ID').format(DateTime.now()),
       "absen": photo != null
           ? MultipartFile.fromFileSync(photo!.path,
               filename: photo?.path.split('/').last)
@@ -375,7 +381,9 @@ Future absen(BuildContext context, String absen) async {
     }).then((onValue) => {
           if (onValue["status"] == "Success")
             {
-              keluar = DateFormat("HH:mm").format(DateTime.now()).toString(),
+              keluar = DateFormat("HH:mm", 'id_ID')
+                  .format(DateTime.now())
+                  .toString(),
               prefs.setString("keluar", keluar),
               showSuccessPopup(context, onValue["message"])
             }
