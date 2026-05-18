@@ -114,7 +114,9 @@ class ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text('BBWS BRANTAS', style: boldTextStyle(size: 16)),
                       15.height,
-                      Text(user["unitObj"]["nama_unit"] ?? '',
+                      Text(
+                          user["unitData"]["nama_unit"] ??
+                              user["unitObj"]["nama_unit"],
                           style: boldTextStyle(size: 16)),
                       15.height,
                       Text(user["jabatan"], style: boldTextStyle(size: 16)),

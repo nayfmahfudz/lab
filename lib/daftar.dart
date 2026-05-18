@@ -36,7 +36,7 @@ class DaftarState extends State<Daftar> {
   final NIK = TextEditingController();
   var Dataunit = "";
   var petugaslapangan = "";
-  var jabatan = "";
+  var jabatan = "14";
   List Listunit = [];
   List petugasOP = [];
   File? _image;

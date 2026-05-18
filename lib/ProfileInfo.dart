@@ -24,11 +24,35 @@ class _EditState extends State<Edit> {
   late TextEditingController jurusanCont;
   late TextEditingController ttlCont;
   late TextEditingController domisiliCont;
-
+  late TextEditingController petugasCont;
+  late TextEditingController lokasiCont;
+  late TextEditingController NIK;
+  List Listunit = [];
+  List petugasOP = [];
+  var petugaslapangan = "";
+  var jabatan = "14";
+  var Dataunit = "";
   @override
   void initState() {
     super.initState();
-
+    tenaga_op(context).then((value) {
+      setState(() {
+        petugasOP = value;
+        petugasCont.text = value[0]["id"].toString();
+      });
+    }).catchError((e) {
+      print(e);
+      toast("Gagal mengambil data petugas");
+    });
+    unit(context).then((value) {
+      setState(() {
+        Listunit = value;
+        Dataunit = value[0]["id"]?.toString() ?? '';
+      });
+    }).catchError((e) {
+      print(e);
+      toast("Gagal mengambil data unit");
+    });
     emailCont = TextEditingController(text: user['email']?.toString() ?? '');
     passwordCont = TextEditingController();
     sekolahCont =
@@ -41,6 +65,8 @@ class _EditState extends State<Edit> {
     ttlCont = TextEditingController(text: user['TTL']?.toString() ?? '');
     domisiliCont =
         TextEditingController(text: user['domisili']?.toString() ?? '');
+    lokasiCont = TextEditingController(text: user['lokasi']?.toString() ?? '');
+    NIK = TextEditingController(text: user['nik']?.toString() ?? '');
   }
 
   bool obscureText = true;
@@ -73,6 +99,10 @@ class _EditState extends State<Edit> {
                               Text('Edit Profile',
                                   style: boldTextStyle(size: 24)),
                               16.height,
+                              buildTextField('NIK', NIK),
+                              16.height,
+                              buildTextField('Alamat', alamatCont),
+                              16.height,
                               buildTextField('Email', emailCont,
                                   inputType: TextInputType.emailAddress,
                                   email: true),
@@ -89,16 +119,48 @@ class _EditState extends State<Edit> {
                               16.height,
                               buildTextField('Domisili', domisiliCont),
                               16.height,
-                              // dropdownField(
-                              //   Listunit,
-                              //   onChanged: (newValue) {
-                              //     if (newValue is Map) {
-                              //       setState(() {
-                              //         Dataunit = newValue['id']?.toString() ?? '';
-                              //       });
-                              //     }
-                              //   },
-                              // ),
+                              buildTextField('Lokasi', lokasiCont),
+                              16.height,
+                              dropdownFieldphs(
+                                judul: "Tipe Petugas",
+                                ["Petugas OP", "Tenaga Pendukung"],
+                                onChanged: (newValue) {
+                                  if (newValue == "Tenaga Pendukung") {
+                                    setState(() {
+                                      petugaslapangan = "0";
+                                    });
+                                  } else {
+                                    setState(() {
+                                      petugaslapangan = "1";
+                                    });
+                                  }
+                                },
+                              ),
+                              petugaslapangan == "1" ? 16.height : Container(),
+                              petugaslapangan == "1"
+                                  ? dropdownFieldop(
+                                      judul: "Petugas OP",
+                                      petugasOP,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          jabatan = newValue["id"].toString();
+                                        });
+                                      },
+                                    )
+                                  : Container(),
+                              16.height,
+                              dropdownField(
+                                Listunit,
+                                judul: "Unit",
+                                onChanged: (newValue) {
+                                  if (newValue is Map) {
+                                    setState(() {
+                                      Dataunit =
+                                          newValue['id']?.toString() ?? '';
+                                    });
+                                  }
+                                },
+                              ),
                             ],
                           ),
                         ),
@@ -113,7 +175,11 @@ class _EditState extends State<Edit> {
                             'pendidikan_terakhir': pendidikanCont.text,
                             'jurusan': jurusanCont.text,
                             'TTL': ttlCont.text,
+                            "jabatan": jabatan,
                             'domisili': domisiliCont.text,
+                            'nik': NIK.text,
+                            'lokasi': lokasiCont.text,
+                            "unit": Dataunit,
                             'id': user['id'].toString(),
                           };
                           await edit(context, data).then((value) {

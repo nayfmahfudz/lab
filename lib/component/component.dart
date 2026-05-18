@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:path_provider/path_provider.dart';
 import 'package:Absen_BBWS/fom.dart';
 import 'package:Absen_BBWS/setting.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,12 +41,17 @@ List<Widget> pilihan(Function(File)? onImagePicked) {
 }
 
 final ImagePicker _picker = ImagePicker();
-Future pickImageFromGallery() async {
+Future<File?> pickImageFromGallery() async {
   print("object");
   final XFile? pickedFile =
       await _picker.pickImage(source: ImageSource.gallery);
   if (pickedFile != null) {
-    return File(pickedFile.path);
+    final bytes = await pickedFile.readAsBytes();
+
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/${pickedFile.name}');
+
+    return await file.writeAsBytes(bytes);
   } else {
     return null;
   }
@@ -55,7 +60,12 @@ Future pickImageFromGallery() async {
 Future<File?> pickImageFromCamera() async {
   final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
   if (pickedFile != null) {
-    return File(pickedFile.path);
+    final bytes = await pickedFile.readAsBytes();
+
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/${pickedFile.name}');
+
+    return await file.writeAsBytes(bytes);
   } else {
     return null;
   }
@@ -249,6 +259,7 @@ String? validateEmail(String? value) {
 
 Widget dropdownFieldphs(
   List list, {
+  String judul = "Select an option",
   bool isPassword = false,
   TextInputType inputType = TextInputType.text,
   Function(dynamic)? onChanged,
@@ -270,13 +281,14 @@ Widget dropdownFieldphs(
         );
       }).toList(),
       onChanged: onChanged,
-      hint: const Text('Select an option'),
+      hint: Text(judul),
     ),
   );
 }
 
 Widget dropdownFieldop(
   List list, {
+  String judul = "Select an option",
   bool isPassword = false,
   TextInputType inputType = TextInputType.text,
   Function(dynamic)? onChanged,
@@ -299,7 +311,7 @@ Widget dropdownFieldop(
         );
       }).toList(),
       onChanged: onChanged,
-      hint: const Text('Select an option'),
+      hint: Text(judul),
     ),
   );
 }
@@ -436,8 +448,10 @@ Widget dropdownProgress(
 
 Widget dropdownField(
   List list, {
+  String judul = "Select an option",
   bool isPassword = false,
   TextInputType inputType = TextInputType.text,
+  Map? Dataunit,
   Function(Object?)? onChanged,
 }) {
   return Container(
@@ -456,10 +470,8 @@ Widget dropdownField(
           child: Text(value['nama_unit'], style: const TextStyle(color: hitam)),
         );
       }).toList(),
-      // value: Dataunit,
       onChanged: onChanged,
-
-      hint: const Text('Select an option'),
+      hint: Text(judul),
     ),
   );
 }
